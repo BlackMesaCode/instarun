@@ -43,8 +43,11 @@ namespace InstaRun
 
         public static void CreateSampleConfigXml()
         {
-            var objectToSerialize = CreateSampleConfig();
-            Serialize<Config>(objectToSerialize, App.PathToSampleConfig);
+            if (!File.Exists(App.PathToSampleConfig))
+            {
+                var objectToSerialize = CreateSampleConfig();
+                Serialize<Config>(objectToSerialize, App.PathToSampleConfig);
+            }
         }
 
 

@@ -37,6 +37,9 @@ namespace InstaRun
             this.Dispatcher.UnhandledException += OnDispatcherUnhandledException;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
+            // Update current working environment, because it is wrongly set, when the app is started from the registry run
+            Environment.CurrentDirectory = ExeDir;
+
             // Check if Config.xml exists
             if (!File.Exists(PathToConfig))
             {
