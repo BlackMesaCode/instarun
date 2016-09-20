@@ -32,6 +32,16 @@ namespace InstaRun
 
         public App()
         {
+            // Check if Config.xml exists
+            if (!File.Exists(PathToConfig))
+            {
+                MessageBox.Show($"Couldn't find: {PathToConfig}\n\nProgram will be closed.");
+                App.Current.Shutdown();
+            }
+
+            // Create invisible window to catch clicks
+            CreateInvisibleWindow();
+
             // Create NotifyIcon in the tray menu
             TrayManager = new TrayManager();
 
@@ -53,6 +63,33 @@ namespace InstaRun
             CreateFileWatcher(ExeDir);
         }
 
+        private void CreateInvisibleWindow()
+        {
+            var window = new Window();
+            window.WindowStyle = WindowStyle.None;
+            window.AllowsTransparency = true;
+            window.Opacity = 0.01;
+            window.MouseLeftButtonDown += Window_MouseLeftButtonDown;
+            window.Topmost = true;
+            window.Left = 0;
+            window.Top = -19;
+            window.Height = 20;
+            window.Width = 10000;
+            window.ShowInTaskbar = false;
+            window.Cursor = Cursors.ScrollS;
+            window.Show();
+        }
+
+        private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (_reinitialize)
+            {
+                Initialize();
+                _reinitialize = false;
+            }
+
+            ContextMenu.IsOpen = true;
+        }
 
         private void App_Exit(object sender, ExitEventArgs e)
         {
@@ -73,16 +110,13 @@ namespace InstaRun
 
         private void MouseHook_ButtonDown(object sender, MouseEventArgsExtended e)
         {
-            //if (e.Y == 0)
-            //    Mouse.SetCursor(Cursors.Hand);
-            //else
-            //    Mouse.SetCursor(Cursors.Arrow);
-
             if (_reinitialize)
+            {
                 Initialize();
+                _reinitialize = false;
+            }
 
-
-            if (e.Button == System.Windows.Forms.MouseButtons.Left && e.Y <= 2 && !ContextMenu.IsOpen)
+            if (e.Button == System.Windows.Forms.MouseButtons.Left && e.Y == 0 && !ContextMenu.IsOpen)
             {
                 ContextMenu.IsOpen = true;
                 e.Handled = true;

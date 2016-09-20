@@ -23,7 +23,20 @@ namespace InstaRun
         {
             var contextMenu = new ContextMenu();
             CreateContextMenuHelper(contextMenu, null, items);
+
+            // add close option
+            var menuItemToClose = new MenuItem();
+            menuItemToClose.DataContext = contextMenu;
+            menuItemToClose.Header = "Close";
+            menuItemToClose.Click += MenuItemToClose_Click;
+            contextMenu.Items.Add(menuItemToClose);
             return contextMenu;
+        }
+
+        private static void MenuItemToClose_Click(object sender, RoutedEventArgs e)
+        {
+            var contextMenu = (sender as MenuItem).DataContext as ContextMenu;
+            contextMenu.IsOpen = false;
         }
 
         public static void CreateContextMenuHelper(ContextMenu contextMenu, MenuItem parent, List<Item> items)

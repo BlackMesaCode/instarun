@@ -1,6 +1,7 @@
 ﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,6 +27,8 @@ namespace InstaRun
             contextMenu.MenuItems.Add(new MenuItem("Start with Windows", StartWithWindows) {
                 Checked = IsStartingWithWindows(),
             });
+            contextMenu.MenuItems.Add(new MenuItem("Open Folder", OpenFolder));
+            contextMenu.MenuItems.Add(new MenuItem("Restart", Restart));
             contextMenu.MenuItems.Add(new MenuItem("Close", Close));
             return contextMenu;
         }
@@ -44,6 +47,17 @@ namespace InstaRun
                 registryKey.SetValue("InstaRun", "\"" + Application.ExecutablePath.ToString() + "\"");
                 menuItem.Checked = true;
             }
+        }
+
+        private void OpenFolder(object sender, EventArgs e)
+        {
+            Process.Start("explorer.exe", App.ExeDir);
+        }
+
+        private void Restart(object sender, EventArgs e)
+        {
+            Process.Start(App.ExePath);
+            App.Current.Shutdown();
         }
 
         public bool IsStartingWithWindows()

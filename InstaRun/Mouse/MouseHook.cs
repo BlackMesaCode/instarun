@@ -55,14 +55,6 @@ namespace InstaRun
                     case (int)WM.MBUTTONDOWN:
                         buttonDown = MouseButtons.Middle;
                         break;
-                    case (int)WM.XBUTTONDOWN:
-
-                        // die Postmessage liefert zwei 32bit Werte: den wParam und den lParam. Im LParam vom WM_XButtondown gibt es ein HIGHWORD und ein LOWWORD (zusammen ein DWORD), der HIWORD stellt einen Flag dar, der 0x0001 für XButton1 und 0x0002 für XButton2 liefert :-)
-                        if (hookStruct.mouseData == 0x00010000)
-                            buttonDown = MouseButtons.XButton1;
-                        else
-                            buttonDown = MouseButtons.XButton2;
-                        break;
 
 
                     case (int)WM.LBUTTONUP:
@@ -74,14 +66,7 @@ namespace InstaRun
                     case (int)WM.MBUTTONUP:
                         buttonUp = MouseButtons.Middle;
                         break;
-                    case (int)WM.XBUTTONUP:
 
-                        // die Postmessage liefert zwei 32bit Werte: den wParam und den lParam. Im LParam vom WM_XButtondown gibt es ein HIGHWORD und ein LOWWORD (zusammen ein DWORD), der HIWORD stellt einen Flag dar, der 0x0001 für XButton1 und 0x0002 für XButton2 liefert :-)
-                        if (hookStruct.mouseData == 0x00010000)
-                            buttonUp = MouseButtons.XButton1;
-                        else
-                            buttonUp = MouseButtons.XButton2;
-                        break;
 
                     case (int)WM.MOUSEWHEEL:
                         delta = High16(hookStruct.mouseData);
@@ -107,7 +92,6 @@ namespace InstaRun
                     }
                 }
 
-
                 if (buttonUp != MouseButtons.None)
                 {
                     if (ButtonUp != null)
@@ -117,22 +101,6 @@ namespace InstaRun
                     }
                 }
 
-
-                if (OnMouseInput != null)
-                {
-                    mouseEventArgsExtended = new MouseEventArgsExtended(buttonDown, clickCount, hookStruct.pt.x, hookStruct.pt.y, 0);
-                    OnMouseInput(this, mouseEventArgsExtended);
-                }
-
-
-                if (delta != 0)
-                {
-                    if (Wheeled != null)
-                    {
-                        mouseEventArgsExtended = new MouseEventArgsExtended(MouseButtons.None, clickCount, hookStruct.pt.x, hookStruct.pt.y, delta);
-                        Wheeled(this, mouseEventArgsExtended);
-                    }
-                }
 
                 if (mouseEventArgsExtended != null && mouseEventArgsExtended.Handled)
                     return 1;
