@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,6 +21,9 @@ namespace InstaRun
     /// </summary>
     public partial class MainWindow : Window
     {
+        public MouseHook MouseHook;
+        public ContextMenu MyContextMenu;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -27,17 +31,25 @@ namespace InstaRun
             var configManager = new ConfigManager();
             //configManager.CreateSampleConfigXml();
             var config = configManager.GetConfig();
-            var contextMenu = CreateContextMenu(config.Items);
-            contextMenu.IsOpen = true;
+            MyContextMenu = CreateContextMenu(config.Items);
+            
+
+            MouseHook = new MouseHook();
+            MouseHook.ButtonDown += MouseHook_ButtonDown;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void MouseHook_ButtonDown(object sender, MouseEventArgsExtended e)
         {
-            var button = sender as FrameworkElement;
-            if (button != null)
+            if (e.Button == System.Windows.Forms.MouseButtons.Left && e.Y == 0 && !MyContextMenu.IsOpen)
             {
-                button.ContextMenu.IsOpen = true;
+                MyContextMenu.IsOpen = true;
+                e.Handled = true;
             }
+            //else if (e.Button == System.Windows.Forms.MouseButtons.Left && MyContextMenu.IsOpen) // !MouseOverItem
+            //{
+            //    MyContextMenu.IsOpen = false;
+            //    e.Handled = false;
+            //}
         }
 
 
@@ -63,7 +75,10 @@ namespace InstaRun
                     var executable = (item as Executable);
 
                     newMenuItem.Header = executable.Name;
-
+                    newMenuItem.ToolTip = executable.Path;
+                    newMenuItem.DataContext = executable;
+                    newMenuItem.Click += NewMenuItem_Click;
+                    
                     if (parent == null)
                         contextMenu.Items.Add(newMenuItem);
                     else
@@ -96,5 +111,10 @@ namespace InstaRun
 
         }
 
+        private void NewMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var dataContext = (sender as MenuItem).DataContext as Executable;
+            Process.Start(dataContext.Path);
+        }
     }
 }
