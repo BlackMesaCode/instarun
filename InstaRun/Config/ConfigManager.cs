@@ -21,14 +21,16 @@ namespace InstaRun
             var settings = new Settings();
             var items = new List<Item>()
             {
-                new Executable("VSCode", "code ."),
-                new Executable("Explorer", "explorer.exe"),
+                new Executable("Self", @"InstaRun.exe"),
+                new Executable("VSCode", @"code", true, "."),
+                new Executable("PowerShell", @"%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe"),
+                new Executable("UserProfile", @"%USERPROFILE%"),
                 new Seperator(),
                 new Container("Browsers", new List<Item>() {
-                    new Executable("Internet Explorer", "iexplore"),
-                    new Executable("Chrome", "chrome"),
+                    new Executable("Internet Explorer (Google)", @"iexplore", true, "www.google.de"),
+                    new Executable("Chrome", @"chrome", true),
                     new Container("Test Browsers", new List<Item>() {
-                        new Executable("Firefox", "firefox"),
+                        new Executable("Firefox", @"firefox", true),
                     }),
                 }),
             };

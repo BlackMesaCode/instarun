@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace InstaRun
 {
@@ -16,44 +17,63 @@ namespace InstaRun
     public partial class App : Application
     {
         public MouseHook MouseHook;
-        public ContextMenu MyContextMenu;
+        public ContextMenu ContextMenu;
+        public TrayManager TrayManager;
 
         public App()
         {
-            System.Windows.Forms.NotifyIcon ni = new System.Windows.Forms.NotifyIcon();
-            ni.ContextMenu = new System.Windows.Forms.ContextMenu();
-            ni.ContextMenu.MenuItems.Add(new System.Windows.Forms.MenuItem("Create Auto Run Entry"));
-            ni.Icon = new System.Drawing.Icon(@"InstaRun.ico");
-            ni.Visible = true;
+            // Create NotifyIcon in the tray menu
+            TrayManager = new TrayManager();
 
+            // Add Exit Handler to dispose tray menu
+            Exit += App_Exit;
+
+            // Deserialize Config.xml to a config object
             var configManager = new ConfigManager();
-            //configManager.CreateSampleConfigXml(); // Just in case someone accidently deleted the config.xml and doesnt remember the xml schema :)
+            // Just in case someone accidently deleted the config.xml and doesnt remember the xml schema :)
+            configManager.CreateSampleConfigXml();
             var config = configManager.GetConfig();
-            MyContextMenu = CreateContextMenu(config.Items);
 
+            // Generate the ContextMenu out of the config object
+            ContextMenu = CreateContextMenu(config.Items);
 
+            // ToDo subscript to file changed event -> then recreate ContextMenu
+
+            // Intercept MouseButtonDown event to open ContextMenu
             MouseHook = new MouseHook();
             MouseHook.ButtonDown += MouseHook_ButtonDown;
+
+            
+        }
+
+        private void App_Exit(object sender, ExitEventArgs e)
+        {
+            TrayManager.NotifyIcon.Icon = null; // Dispose NotifyIcon in the tray
         }
 
         private void MouseHook_ButtonDown(object sender, MouseEventArgsExtended e)
         {
-            if (e.Button == System.Windows.Forms.MouseButtons.Left && e.Y == 0 && !MyContextMenu.IsOpen)
+            //if (e.Y == 0)
+            //    Mouse.SetCursor(Cursors.Hand);
+            //else
+            //    Mouse.SetCursor(Cursors.Arrow);
+
+            if (e.Button == System.Windows.Forms.MouseButtons.Left && e.Y == 0 && !ContextMenu.IsOpen)
             {
-                MyContextMenu.IsOpen = true;
+                ContextMenu.IsOpen = true;
                 e.Handled = true;
             }
-            //else if (e.Button == System.Windows.Forms.MouseButtons.Left && MyContextMenu.IsOpen) // !MouseOverItem
-            //{
-            //    MyContextMenu.IsOpen = false;
-            //    e.Handled = false;
-            //}
+            else if (e.Button == System.Windows.Forms.MouseButtons.Left && Mouse.DirectlyOver == ContextMenu) //&& MyContextMenu.IsOpen) // !MouseOverItem
+            {
+                ContextMenu.IsOpen = false;
+                e.Handled = false;
+            }
         }
 
 
         public void UpdateSetting(Settings settings)
         {
-            MyContextMenu.MaxWidth = settings.MaxWidth;
+            ContextMenu.MaxWidth = settings.MaxWidth;
         }
 
         public ContextMenu CreateContextMenu(List<Item> items)
@@ -65,7 +85,7 @@ namespace InstaRun
 
         public void CreateContextMenuHelper(ContextMenu contextMenu, MenuItem parent, List<Item> items)
         {
-            foreach (var item in items.OrderBy(i => i.Position)) // TODO Add Icons, Add Execution of Path command
+            foreach (var item in items.OrderBy(i => i.Position)) // TODO Add Icons
             {
                 if (item.GetType() == typeof(Executable))
                 {
@@ -113,7 +133,15 @@ namespace InstaRun
         {
 
             var dataContext = (sender as MenuItem).DataContext as Executable;
-            Process.Start(dataContext.Path);
+            try
+            {
+                Process.Start(dataContext.Path, dataContext.Arguments);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.ToString());
+            }
+            
         }
     }
 }
