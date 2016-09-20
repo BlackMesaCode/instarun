@@ -57,14 +57,8 @@ namespace InstaRun
             // (just in case someone accidently deleted the config.xml and doesnt remember the xml schema)
             ConfigManager.CreateSampleConfigXml();
 
-            // Deserialize config.xml
-            Config = ConfigManager.GetConfig();
-
-            // Generate the ContextMenu out of the config object
-            ContextMenu = ContextMenuManager.CreateContextMenu(Config.Items);
-
-            // Update application settings
-            UpdateSettings(Config.Settings);
+            // Deserialize config.xml and build context menu
+            Initialize();
 
             // Create NotifyIcon in the tray menu
             TrayManager = new TrayManager();
@@ -96,22 +90,23 @@ namespace InstaRun
             window.Show();
         }
 
+        public void Initialize()
+        {
+            // Deserialize config.xml
+            Config = ConfigManager.GetConfig();
+
+            // Generate the ContextMenu out of the config object
+            ContextMenu = ContextMenuManager.CreateContextMenu(Config.Items);
+
+            // Update application settings
+            UpdateSettings(Config.Settings);
+        }
 
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (Reinitialize)
             {
-                // Deserialize config.xml
-                Config = ConfigManager.GetConfig();
-
-                // Rebuild IconCache
-                IconCache.BuildCache(Config.Items);
-
-                // Generate the ContextMenu out of the config object
-                ContextMenu = ContextMenuManager.CreateContextMenu(Config.Items);
-
-                // Update application settings
-                UpdateSettings(Config.Settings);
+                Initialize();
                 Reinitialize = false;
             }
 

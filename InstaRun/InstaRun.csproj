@@ -38,10 +38,6 @@
     <ApplicationIcon>InstaRun.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="IconLib, Version=0.73.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\IconLib.Unofficial.0.73.0\lib\net20\IconLib.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -70,7 +66,6 @@
     <Compile Include="Context Menu\Executable.cs" />
     <Compile Include="Context Menu\IconReceiver.cs" />
     <Compile Include="Context Menu\Item.cs" />
-    <Compile Include="IconCache.cs" />
     <Compile Include="Context Menu\Separator.cs" />
     <Compile Include="Config\Settings.cs" />
     <Compile Include="TrayManager.cs" />
@@ -98,7 +93,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

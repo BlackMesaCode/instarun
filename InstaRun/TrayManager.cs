@@ -28,7 +28,6 @@ namespace InstaRun
             contextMenu.MenuItems.Add(new MenuItem("Start with Windows", StartWithWindows) {
                 Checked = IsStartingWithWindows(),
             });
-            contextMenu.MenuItems.Add(new MenuItem("Build Icon Cache", BuildIconCache));
             contextMenu.MenuItems.Add(new MenuItem("Open Folder", OpenFolder));
             contextMenu.MenuItems.Add(new MenuItem("Restart", Restart));
             contextMenu.MenuItems.Add(new MenuItem("Close", Close));
@@ -50,12 +49,6 @@ namespace InstaRun
                 registryKey.SetValue("InstaRun", "\"" + Application.ExecutablePath.ToString() + "\"");
                 menuItem.Checked = true;
             }
-        }
-
-        private void BuildIconCache(object sender, EventArgs e)
-        {
-            IconCache.BuildCache(App.Config.Items);
-            App.Reinitialize = true;
         }
 
         private void OpenFolder(object sender, EventArgs e)

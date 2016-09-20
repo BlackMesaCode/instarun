@@ -56,26 +56,22 @@ namespace InstaRun
 
                     if (!executable.IsInGlobalPath) // No icons for global path calls possible - we would have to search all the directories in the PATH variable
                     {
-                        if (File.Exists(executable.Path) || Directory.Exists(executable.Path))
+                        if (File.Exists(executable.Path))
                         {
-                            var pathToIcon = Path.Combine(App.PathToIconCache, executable.Name + ".ico");
+                            var icon = Icon.ExtractAssociatedIcon(executable.Path);
+                            var bmp = icon.ToBitmap();
 
-                            if (File.Exists(pathToIcon))
+                            newMenuItem.Icon = new System.Windows.Controls.Image
                             {
-                                var bitmap = new BitmapImage();
-                                var stream = File.OpenRead(pathToIcon);
-                                bitmap.BeginInit();
-                                bitmap.CacheOption = BitmapCacheOption.OnLoad;
-                                bitmap.StreamSource = stream;
-                                bitmap.EndInit();
-                                stream.Close();
-                                stream.Dispose();
-
-                                newMenuItem.Icon = new System.Windows.Controls.Image
-                                {
-                                    Source = bitmap
-                                };
-                            }
+                                Source = icon.ToImageSource(),
+                            };
+                        }
+                        else if (Directory.Exists(executable.Path))
+                        {
+                            newMenuItem.Icon = new System.Windows.Controls.Image
+                            {
+                                Source = IconReceiver.ReceiveIcon(executable.Path, false).ToImageSource()
+                            };
                         }
                     }
                     if (parent == null)
