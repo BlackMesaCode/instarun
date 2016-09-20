@@ -29,7 +29,7 @@ namespace InstaRun
             InitializeComponent();
 
             var configManager = new ConfigManager();
-            //configManager.CreateSampleConfigXml();
+            //configManager.CreateSampleConfigXml(); // Just in case someone accidently deleted the config.xml and doesnt remember the xml schema :)
             var config = configManager.GetConfig();
             MyContextMenu = CreateContextMenu(config.Items);
             
