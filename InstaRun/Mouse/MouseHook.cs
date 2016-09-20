@@ -4,7 +4,6 @@ using System.Windows.Forms;
 
 namespace InstaRun
 {
-
     public class MouseHook
     {
         protected IntPtr MyHook = IntPtr.Zero;

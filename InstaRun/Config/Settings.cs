@@ -10,18 +10,16 @@ namespace InstaRun
     {
         public DockingArea DockingArea { get; set; }
         public double MaxWidth { get; set; }
-        public bool StartWithWindows { get; set; }
 
         public Settings()
         {
 
         }
 
-        public Settings(DockingArea dockingArea = DockingArea.Top, double maxWidth = 200.0, bool startWithWindows = true)
+        public Settings(DockingArea dockingArea = DockingArea.Top, double maxWidth = 200.0)
         {
             DockingArea = dockingArea;
             MaxWidth = maxWidth;
-            StartWithWindows = startWithWindows;
         }
 
     }

@@ -9,14 +9,10 @@ using System.Xml.Serialization;
 
 namespace InstaRun
 {
-    public class ConfigManager
+    public static class ConfigManager
     {
-        public static readonly string ExePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-        public static readonly string ExeDir = Path.GetDirectoryName(ExePath);
-        public static readonly string ConfigFileName = "Config.xml";
-        public static readonly string SampleConfigFileName = "Config.Sample.xml";
 
-        public Config CreateSampleConfig()
+        public static Config CreateSampleConfig()
         {
             var settings = new Settings();
             var items = new List<Item>()
@@ -38,18 +34,17 @@ namespace InstaRun
             return config;
         }
 
-        public Config GetConfig()
+
+        public static Config GetConfig()
         {
-            var path = Path.Combine(ExeDir, ConfigFileName);
-            return Deserialize<Config>(path);
+            return Deserialize<Config>(App.PathToConfig);
         }
 
-        public void CreateSampleConfigXml()
-        {
-            var path = Path.Combine(ExeDir, SampleConfigFileName);
-            var objectToSerialize = CreateSampleConfig();
 
-            Serialize<Config>(objectToSerialize, path);
+        public static void CreateSampleConfigXml()
+        {
+            var objectToSerialize = CreateSampleConfig();
+            Serialize<Config>(objectToSerialize, App.PathToSampleConfig);
         }
 
 
@@ -59,10 +54,12 @@ namespace InstaRun
             {
                 XmlSerializer xs = new XmlSerializer(typeof(T));
                 T result = default(T);
+
                 using (var reader = new StreamReader(path))
                 {
                     result = (T)xs.Deserialize(reader);
                 }
+
                 return result;
             }
             catch (Exception)
