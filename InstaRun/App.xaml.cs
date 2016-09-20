@@ -69,18 +69,20 @@ namespace InstaRun
             window.WindowStyle = WindowStyle.None;
             window.AllowsTransparency = true;
             window.Opacity = 0.01;
-            window.MouseLeftButtonDown += Window_MouseLeftButtonDown;
+            window.MouseLeftButtonUp += Window_MouseLeftButtonUp; // up event is more reliable when used on top of chrome Oo
             window.Topmost = true;
             window.Left = 0;
-            window.Top = -18;
+            window.Top = -17;
             window.Height = 20;
             window.Width = 10000;
             window.ShowInTaskbar = false;
+            window.ResizeMode = ResizeMode.NoResize;
             window.Cursor = Cursors.ScrollS;
             window.Show();
         }
 
-        private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+
+        private void Window_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (_reinitialize)
             {

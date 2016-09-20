@@ -14,14 +14,14 @@ namespace InstaRun
         public string Path
         {
             get {
-                if (IsGlobalPath)
+                if (IsInGlobalPath)
                     return path;
                 return System.IO.Path.GetFullPath(Environment.ExpandEnvironmentVariables(path));
             }
             set { path = value; }
         }
 
-        public bool IsGlobalPath { get; set; }
+        public bool IsInGlobalPath { get; set; }
         public string Arguments { get; set; }
 
         public Executable()
@@ -33,7 +33,7 @@ namespace InstaRun
         {
             Name = name;
             Path = path;
-            IsGlobalPath = isGlobalPath;
+            IsInGlobalPath = isGlobalPath;
             Arguments = arguments;
         }
 

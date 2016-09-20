@@ -8,6 +8,6 @@ namespace InstaRun
 {
     public abstract class Item
     {
-        public int Position { get; set; }
+        
     }
 }

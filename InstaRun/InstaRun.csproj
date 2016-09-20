@@ -64,6 +64,7 @@
     <Compile Include="Context Menu\Container.cs" />
     <Compile Include="Context Menu\ContextMenuManager.cs" />
     <Compile Include="Context Menu\Executable.cs" />
+    <Compile Include="Context Menu\IconReceiver.cs" />
     <Compile Include="Context Menu\Item.cs" />
     <Compile Include="Mouse\MouseEventArgsExtended.cs" />
     <Compile Include="Mouse\MouseHook.cs" />
@@ -112,7 +113,7 @@
     <Resource Include="ToDo.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Folder.ico">
+    <None Include="Container.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

@@ -41,7 +41,7 @@ namespace InstaRun
 
         public static void CreateContextMenuHelper(ContextMenu contextMenu, MenuItem parent, List<Item> items)
         {
-            foreach (var item in items.OrderBy(i => i.Position))
+            foreach (var item in items)
             {
                 if (item.GetType() == typeof(Executable))
                 {
@@ -53,7 +53,7 @@ namespace InstaRun
                     newMenuItem.DataContext = executable;
                     newMenuItem.Click += NewMenuItem_Click;
 
-                    if (!executable.IsGlobalPath) // No icons for global path calls possible - we would have to search all the directories in the PATH variable
+                    if (!executable.IsInGlobalPath) // No icons for global path calls possible - we would have to search all the directories in the PATH variable
                     {
                         if (File.Exists(executable.Path))
                         {
@@ -63,6 +63,13 @@ namespace InstaRun
                             newMenuItem.Icon = new System.Windows.Controls.Image
                             {
                                 Source = icon.ToImageSource(),
+                            };
+                        }
+                        else if (Directory.Exists(executable.Path))
+                        {
+                            newMenuItem.Icon = new System.Windows.Controls.Image
+                            {
+                                Source = IconReceiver.ReceiveIcon(executable.Path, false).ToImageSource()
                             };
                         }
                     }
@@ -87,10 +94,10 @@ namespace InstaRun
                     var container = (item as Container);
 
                     newMenuItem.Header = container.Name;
-                    newMenuItem.Icon = new System.Windows.Controls.Image
-                    {
-                        Source = new BitmapImage(new Uri("Folder.ico", UriKind.Relative))
-                    };
+                    //newMenuItem.Icon = new System.Windows.Controls.Image
+                    //{
+                    //    Source = new BitmapImage(new Uri("Container.ico", UriKind.Relative))
+                    //};
 
                     if (parent == null)
                         contextMenu.Items.Add(newMenuItem);
