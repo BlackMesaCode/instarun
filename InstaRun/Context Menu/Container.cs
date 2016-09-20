@@ -8,7 +8,7 @@ using System.Xml.Serialization;
 namespace InstaRun
 {
     [XmlInclude(typeof(Executable))]
-    [XmlInclude(typeof(Seperator))]
+    [XmlInclude(typeof(Separator))]
     public class Container : Item
     {
         public string Name { get; set; }

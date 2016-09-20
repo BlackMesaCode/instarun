@@ -25,7 +25,7 @@ namespace InstaRun
                 new Executable("VSCode", @"code", true, "."),
                 new Executable("PowerShell", @"%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe"),
                 new Executable("UserProfile", @"%USERPROFILE%"),
-                new Seperator(),
+                new Separator(),
                 new Container("Browsers", new List<Item>() {
                     new Executable("Internet Explorer (Google)", @"iexplore", true, "www.google.de"),
                     new Executable("Chrome", @"chrome", true),

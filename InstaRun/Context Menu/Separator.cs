@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace InstaRun
 {
-    public class Seperator : Item
+    public class Separator : Item
     {
-        public Seperator()
+        public Separator()
         {
 
         }

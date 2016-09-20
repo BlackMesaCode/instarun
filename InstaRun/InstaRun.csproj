@@ -34,6 +34,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>InstaRun.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -59,11 +62,12 @@
     </ApplicationDefinition>
     <Compile Include="Config\ConfigManager.cs" />
     <Compile Include="Context Menu\Container.cs" />
+    <Compile Include="Context Menu\ContextMenuManager.cs" />
     <Compile Include="Context Menu\Executable.cs" />
     <Compile Include="Context Menu\Item.cs" />
     <Compile Include="Mouse\MouseEventArgsExtended.cs" />
     <Compile Include="Mouse\MouseHook.cs" />
-    <Compile Include="Context Menu\Seperator.cs" />
+    <Compile Include="Context Menu\Separator.cs" />
     <Compile Include="Config\Settings.cs" />
     <Compile Include="TrayManager.cs" />
     <Compile Include="App.xaml.cs">
@@ -102,6 +106,14 @@
   <ItemGroup>
     <None Include="InstaRun.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="ToDo.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Folder.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

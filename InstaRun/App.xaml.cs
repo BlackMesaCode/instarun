@@ -35,7 +35,7 @@ namespace InstaRun
             var config = configManager.GetConfig();
 
             // Generate the ContextMenu out of the config object
-            ContextMenu = CreateContextMenu(config.Items);
+            ContextMenu = ContextMenuManager.CreateContextMenu(config.Items);
 
             // ToDo subscript to file changed event -> then recreate ContextMenu
 
@@ -76,72 +76,6 @@ namespace InstaRun
             ContextMenu.MaxWidth = settings.MaxWidth;
         }
 
-        public ContextMenu CreateContextMenu(List<Item> items)
-        {
-            var contextMenu = new ContextMenu();
-            CreateContextMenuHelper(contextMenu, null, items);
-            return contextMenu;
-        }
 
-        public void CreateContextMenuHelper(ContextMenu contextMenu, MenuItem parent, List<Item> items)
-        {
-            foreach (var item in items.OrderBy(i => i.Position)) // TODO Add Icons
-            {
-                if (item.GetType() == typeof(Executable))
-                {
-                    var newMenuItem = new MenuItem();
-                    var executable = (item as Executable);
-
-                    newMenuItem.Header = executable.Name;
-                    newMenuItem.ToolTip = executable.Path;
-                    newMenuItem.DataContext = executable;
-                    newMenuItem.Click += NewMenuItem_Click;
-
-                    if (parent == null)
-                        contextMenu.Items.Add(newMenuItem);
-                    else
-                        parent.Items.Add(newMenuItem);
-                }
-                else if (item.GetType() == typeof(Separator))
-                {
-                    var newSeparator = new Separator();
-
-                    if (parent == null)
-                        contextMenu.Items.Add(newSeparator);
-                    else
-                        parent.Items.Add(newSeparator);
-                }
-                else if (item.GetType() == typeof(Container))
-                {
-                    var newMenuItem = new MenuItem();
-                    var container = (item as Container);
-
-                    newMenuItem.Header = container.Name;
-
-                    if (parent == null)
-                        contextMenu.Items.Add(newMenuItem);
-                    else
-                        parent.Items.Add(newMenuItem);
-
-                    CreateContextMenuHelper(contextMenu, newMenuItem, container.Items);
-                }
-            }
-
-        }
-
-        private void NewMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-
-            var dataContext = (sender as MenuItem).DataContext as Executable;
-            try
-            {
-                Process.Start(dataContext.Path, dataContext.Arguments);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.ToString());
-            }
-            
-        }
     }
 }

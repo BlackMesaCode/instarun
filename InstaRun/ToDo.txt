@@ -1,0 +1,1 @@
+﻿Cursor effect on hovering upper border?

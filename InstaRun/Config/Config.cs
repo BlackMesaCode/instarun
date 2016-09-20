@@ -10,7 +10,7 @@ namespace InstaRun
     [XmlInclude(typeof(Settings))]
     [XmlInclude(typeof(Item))]
     [XmlInclude(typeof(Executable))]
-    [XmlInclude(typeof(Seperator))]
+    [XmlInclude(typeof(Separator))]
     [XmlInclude(typeof(Container))]
     public class Config
     {
