@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 
 namespace InstaRun
 {
@@ -14,6 +15,7 @@ namespace InstaRun
 
         public static void BuildCache(List<Item> items)
         {
+
             if (!Directory.Exists(App.PathToIconCache))
                 Directory.CreateDirectory(App.PathToIconCache);
 
@@ -29,18 +31,11 @@ namespace InstaRun
                         {
                             var outputPath = Path.Combine(App.PathToIconCache, executable.Name + ".ico");
 
-                            //Icon.ExtractAssociatedIcon(executable.Path).ToBitmap().Save(outputPath);
-
                             Icon icon = Icon.ExtractAssociatedIcon(executable.Path);
                             MultiIcon mIcon = new MultiIcon();
-                            SingleIcon sIcon = mIcon.Add("whatever");
+                            SingleIcon sIcon = mIcon.Add(string.Empty);
                             sIcon.CreateFrom(icon.ToBitmap(), IconOutputFormat.Vista);
                             sIcon.Save(outputPath);
-
-                            //using (FileStream fileStream = new FileStream(outputPath, FileMode.Create))
-                            //{
-                            //    Icon.ExtractAssociatedIcon(executable.Path).Save(fileStream);
-                            //}
                         }
                         else if (Directory.Exists(executable.Path))
                         {
@@ -48,14 +43,9 @@ namespace InstaRun
 
                             Icon icon = IconReceiver.ReceiveIcon(executable.Path, false);
                             MultiIcon mIcon = new MultiIcon();
-                            SingleIcon sIcon = mIcon.Add("whatever");
+                            SingleIcon sIcon = mIcon.Add(string.Empty);
                             sIcon.CreateFrom(icon.ToBitmap(), IconOutputFormat.Vista);
                             sIcon.Save(outputPath);
-
-                            //using (FileStream fileStream = new FileStream(outputPath, FileMode.Create))
-                            //{
-                            //    IconReceiver.ReceiveIcon(executable.Path, false).Save(fileStream);
-                            //}
                         }
                     }
                 }

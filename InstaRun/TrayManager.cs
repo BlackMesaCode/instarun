@@ -13,11 +13,9 @@ namespace InstaRun
     public class TrayManager
     {
         public NotifyIcon NotifyIcon;
-        public Config Config;
 
-        public TrayManager(Config config)
+        public TrayManager()
         {
-            Config = config;
             NotifyIcon = new NotifyIcon();
             NotifyIcon.ContextMenu = CreateContextMenu();
             NotifyIcon.Icon = new System.Drawing.Icon(Path.Combine(App.ExeDir, "InstaRun.ico"));
@@ -56,7 +54,7 @@ namespace InstaRun
 
         private void BuildIconCache(object sender, EventArgs e)
         {
-            IconCache.BuildCache(Config.Items);
+            IconCache.BuildCache(App.Config.Items);
             App.Reinitialize = true;
         }
 

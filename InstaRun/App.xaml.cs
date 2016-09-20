@@ -17,10 +17,9 @@ namespace InstaRun
     /// </summary>
     public partial class App : Application
     {
-        public MouseHook MouseHook;
-        public ContextMenu ContextMenu;
-        public TrayManager TrayManager;
-        public Config Config;
+        public static ContextMenu ContextMenu;
+        public static TrayManager TrayManager;
+        public static Config Config;
 
         public static readonly string ExePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
         public static readonly string ExeDir = Path.GetDirectoryName(ExePath);
@@ -55,11 +54,17 @@ namespace InstaRun
             // (just in case someone accidently deleted the config.xml and doesnt remember the xml schema)
             ConfigManager.CreateSampleConfigXml();
 
-            // Initialize the application based on the config.xml
-            Initialize();
+            // Deserialize config.xml
+            Config = ConfigManager.GetConfig();
+
+            // Generate the ContextMenu out of the config object
+            ContextMenu = ContextMenuManager.CreateContextMenu(Config.Items);
+
+            // Update application settings
+            UpdateSettings(Config.Settings);
 
             // Create NotifyIcon in the tray menu
-            TrayManager = new TrayManager(Config);
+            TrayManager = new TrayManager();
 
             // Intercept MouseButtonDown event to open ContextMenu
             //MouseHook = new MouseHook();
@@ -93,7 +98,17 @@ namespace InstaRun
         {
             if (Reinitialize)
             {
-                Initialize();
+                // Deserialize config.xml
+                Config = ConfigManager.GetConfig();
+
+                // Rebuild IconCache
+                IconCache.BuildCache(Config.Items);
+
+                // Generate the ContextMenu out of the config object
+                ContextMenu = ContextMenuManager.CreateContextMenu(Config.Items);
+
+                // Update application settings
+                UpdateSettings(Config.Settings);
                 Reinitialize = false;
             }
 
@@ -105,37 +120,6 @@ namespace InstaRun
             TrayManager.NotifyIcon.Icon = null; // Dispose NotifyIcon in the tray
         }
 
-        public void Initialize()
-        {
-            // Deserialize config.xml
-            Config = ConfigManager.GetConfig();
-
-            // Generate the ContextMenu out of the config object
-            ContextMenu = ContextMenuManager.CreateContextMenu(Config.Items);
-
-            // Update application settings
-            UpdateSettings(Config.Settings);
-        }
-
-        private void MouseHook_ButtonDown(object sender, MouseEventArgsExtended e)
-        {
-            if (Reinitialize)
-            {
-                Initialize();
-                Reinitialize = false;
-            }
-
-            if (e.Button == System.Windows.Forms.MouseButtons.Left && e.Y == 0 && !ContextMenu.IsOpen)
-            {
-                ContextMenu.IsOpen = true;
-                e.Handled = true;
-            }
-            else if (e.Button == System.Windows.Forms.MouseButtons.Left && Mouse.DirectlyOver == ContextMenu) //&& MyContextMenu.IsOpen) // !MouseOverItem
-            {
-                ContextMenu.IsOpen = false;
-                e.Handled = false;
-            }
-        }
 
 
         public void UpdateSettings(Settings settings)

@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net.Cache;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -61,36 +62,21 @@ namespace InstaRun
 
                             if (File.Exists(pathToIcon))
                             {
+                                var bitmap = new BitmapImage();
+                                var stream = File.OpenRead(pathToIcon);
+                                bitmap.BeginInit();
+                                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                                bitmap.StreamSource = stream;
+                                bitmap.EndInit();
+                                stream.Close();
+                                stream.Dispose();
+
                                 newMenuItem.Icon = new System.Windows.Controls.Image
                                 {
-                                    Source = new BitmapImage(new Uri(pathToIcon, UriKind.Absolute))
+                                    Source = bitmap
                                 };
                             }
                         }
-
-                        //if (File.Exists(executable.Path))
-                        //{
-                        //    //var icon = Icon.ExtractAssociatedIcon(executable.Path);
-                        //    //var bmp = icon.ToBitmap();
-
-                        //    var pathToIcon = Path.Combine(App.PathToIconCache, executable.Name + ".ico");
-
-                        //    if (File.Exists(pathToIcon))
-                        //    {
-                        //        newMenuItem.Icon = new System.Windows.Controls.Image
-                        //        {
-                        //            Source = new BitmapImage(new Uri(pathToIcon, UriKind.Absolute))
-                        //            //Source = icon.ToImageSource(),
-                        //        };
-                        //    }
-                        //}
-                        //else if (Directory.Exists(executable.Path))
-                        //{
-                        //    newMenuItem.Icon = new System.Windows.Controls.Image
-                        //    {
-                        //        //Source = IconReceiver.ReceiveIcon(executable.Path, false).ToImageSource()
-                        //    };
-                        //}
                     }
                     if (parent == null)
                         contextMenu.Items.Add(newMenuItem);

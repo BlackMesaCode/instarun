@@ -71,8 +71,6 @@
     <Compile Include="Context Menu\IconReceiver.cs" />
     <Compile Include="Context Menu\Item.cs" />
     <Compile Include="IconCache.cs" />
-    <Compile Include="Mouse\MouseEventArgsExtended.cs" />
-    <Compile Include="Mouse\MouseHook.cs" />
     <Compile Include="Context Menu\Separator.cs" />
     <Compile Include="Config\Settings.cs" />
     <Compile Include="TrayManager.cs" />
