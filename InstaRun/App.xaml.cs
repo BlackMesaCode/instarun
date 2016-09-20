@@ -13,5 +13,6 @@ namespace InstaRun
     /// </summary>
     public partial class App : Application
     {
+
     }
 }
