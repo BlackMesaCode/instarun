@@ -56,8 +56,8 @@ namespace InstaRun
             Initialize();
 
             // Intercept MouseButtonDown event to open ContextMenu
-            MouseHook = new MouseHook();
-            MouseHook.ButtonDown += MouseHook_ButtonDown;
+            //MouseHook = new MouseHook();
+            //MouseHook.ButtonDown += MouseHook_ButtonDown;
 
             // Watching Config.xml for changes
             CreateFileWatcher(ExeDir);
