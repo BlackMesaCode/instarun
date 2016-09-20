@@ -55,23 +55,42 @@ namespace InstaRun
 
                     if (!executable.IsInGlobalPath) // No icons for global path calls possible - we would have to search all the directories in the PATH variable
                     {
-                        if (File.Exists(executable.Path))
+                        if (File.Exists(executable.Path) || Directory.Exists(executable.Path))
                         {
-                            var icon = Icon.ExtractAssociatedIcon(executable.Path);
-                            var bmp = icon.ToBitmap();
+                            var pathToIcon = Path.Combine(App.PathToIconCache, executable.Name + ".ico");
 
-                            newMenuItem.Icon = new System.Windows.Controls.Image
+                            if (File.Exists(pathToIcon))
                             {
-                                Source = icon.ToImageSource(),
-                            };
+                                newMenuItem.Icon = new System.Windows.Controls.Image
+                                {
+                                    Source = new BitmapImage(new Uri(pathToIcon, UriKind.Absolute))
+                                };
+                            }
                         }
-                        else if (Directory.Exists(executable.Path))
-                        {
-                            newMenuItem.Icon = new System.Windows.Controls.Image
-                            {
-                                Source = IconReceiver.ReceiveIcon(executable.Path, false).ToImageSource()
-                            };
-                        }
+
+                        //if (File.Exists(executable.Path))
+                        //{
+                        //    //var icon = Icon.ExtractAssociatedIcon(executable.Path);
+                        //    //var bmp = icon.ToBitmap();
+
+                        //    var pathToIcon = Path.Combine(App.PathToIconCache, executable.Name + ".ico");
+
+                        //    if (File.Exists(pathToIcon))
+                        //    {
+                        //        newMenuItem.Icon = new System.Windows.Controls.Image
+                        //        {
+                        //            Source = new BitmapImage(new Uri(pathToIcon, UriKind.Absolute))
+                        //            //Source = icon.ToImageSource(),
+                        //        };
+                        //    }
+                        //}
+                        //else if (Directory.Exists(executable.Path))
+                        //{
+                        //    newMenuItem.Icon = new System.Windows.Controls.Image
+                        //    {
+                        //        //Source = IconReceiver.ReceiveIcon(executable.Path, false).ToImageSource()
+                        //    };
+                        //}
                     }
                     if (parent == null)
                         contextMenu.Items.Add(newMenuItem);

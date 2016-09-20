@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,12 +13,14 @@ namespace InstaRun
     public class TrayManager
     {
         public NotifyIcon NotifyIcon;
+        public Config Config;
 
-        public TrayManager()
+        public TrayManager(Config config)
         {
+            Config = config;
             NotifyIcon = new NotifyIcon();
             NotifyIcon.ContextMenu = CreateContextMenu();
-            NotifyIcon.Icon = new System.Drawing.Icon(@"InstaRun.ico");
+            NotifyIcon.Icon = new System.Drawing.Icon(Path.Combine(App.ExeDir, "InstaRun.ico"));
             NotifyIcon.Visible = true;
         }
 
@@ -27,11 +30,13 @@ namespace InstaRun
             contextMenu.MenuItems.Add(new MenuItem("Start with Windows", StartWithWindows) {
                 Checked = IsStartingWithWindows(),
             });
+            contextMenu.MenuItems.Add(new MenuItem("Build Icon Cache", BuildIconCache));
             contextMenu.MenuItems.Add(new MenuItem("Open Folder", OpenFolder));
             contextMenu.MenuItems.Add(new MenuItem("Restart", Restart));
             contextMenu.MenuItems.Add(new MenuItem("Close", Close));
             return contextMenu;
         }
+
 
         private void StartWithWindows(object sender, EventArgs e)
         {
@@ -47,6 +52,12 @@ namespace InstaRun
                 registryKey.SetValue("InstaRun", "\"" + Application.ExecutablePath.ToString() + "\"");
                 menuItem.Checked = true;
             }
+        }
+
+        private void BuildIconCache(object sender, EventArgs e)
+        {
+            IconCache.BuildCache(Config.Items);
+            App.Reinitialize = true;
         }
 
         private void OpenFolder(object sender, EventArgs e)

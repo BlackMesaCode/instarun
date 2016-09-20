@@ -20,18 +20,24 @@ namespace InstaRun
         public MouseHook MouseHook;
         public ContextMenu ContextMenu;
         public TrayManager TrayManager;
+        public Config Config;
 
         public static readonly string ExePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
         public static readonly string ExeDir = Path.GetDirectoryName(ExePath);
         public static readonly string ConfigFileName = "Config.xml";
         public static readonly string SampleConfigFileName = "Config.Sample.xml";
+        public static readonly string IconCacheFolderName = "IconCache";
         public static readonly string PathToConfig = Path.Combine(ExeDir, ConfigFileName);
         public static readonly string PathToSampleConfig = Path.Combine(ExeDir, SampleConfigFileName);
+        public static readonly string PathToIconCache = Path.Combine(ExeDir, IconCacheFolderName);
 
-        bool _reinitialize = false;
+        public static bool Reinitialize = false;
 
         public App()
         {
+            this.Dispatcher.UnhandledException += OnDispatcherUnhandledException;
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+
             // Check if Config.xml exists
             if (!File.Exists(PathToConfig))
             {
@@ -41,9 +47,6 @@ namespace InstaRun
 
             // Create invisible window to catch clicks
             CreateInvisibleWindow();
-
-            // Create NotifyIcon in the tray menu
-            TrayManager = new TrayManager();
 
             // Add Exit Handler to dispose tray menu
             Exit += App_Exit;
@@ -55,6 +58,9 @@ namespace InstaRun
             // Initialize the application based on the config.xml
             Initialize();
 
+            // Create NotifyIcon in the tray menu
+            TrayManager = new TrayManager(Config);
+
             // Intercept MouseButtonDown event to open ContextMenu
             //MouseHook = new MouseHook();
             //MouseHook.ButtonDown += MouseHook_ButtonDown;
@@ -62,6 +68,7 @@ namespace InstaRun
             // Watching Config.xml for changes
             CreateFileWatcher(ExeDir);
         }
+
 
         private void CreateInvisibleWindow()
         {
@@ -84,10 +91,10 @@ namespace InstaRun
 
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (_reinitialize)
+            if (Reinitialize)
             {
                 Initialize();
-                _reinitialize = false;
+                Reinitialize = false;
             }
 
             ContextMenu.IsOpen = true;
@@ -101,21 +108,21 @@ namespace InstaRun
         public void Initialize()
         {
             // Deserialize config.xml
-            var config = ConfigManager.GetConfig();
+            Config = ConfigManager.GetConfig();
 
             // Generate the ContextMenu out of the config object
-            ContextMenu = ContextMenuManager.CreateContextMenu(config.Items);
+            ContextMenu = ContextMenuManager.CreateContextMenu(Config.Items);
 
             // Update application settings
-            UpdateSettings(config.Settings);
+            UpdateSettings(Config.Settings);
         }
 
         private void MouseHook_ButtonDown(object sender, MouseEventArgsExtended e)
         {
-            if (_reinitialize)
+            if (Reinitialize)
             {
                 Initialize();
-                _reinitialize = false;
+                Reinitialize = false;
             }
 
             if (e.Button == System.Windows.Forms.MouseButtons.Left && e.Y == 0 && !ContextMenu.IsOpen)
@@ -161,9 +168,46 @@ namespace InstaRun
         private void OnChanged(object source, FileSystemEventArgs e)
         {
             // Reinitialize if config.xml has changed
-            _reinitialize = true;
+            Reinitialize = true;
         }
 
+
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            HandleUncaughtException((Exception)e.ExceptionObject);
+        }
+
+        void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            HandleUncaughtException(e.Exception);
+        }
+
+        public void HandleUncaughtException(Exception ex)
+        {
+            string errorMessage = string.Empty;
+
+            if (!string.IsNullOrWhiteSpace(ex.InnerException?.ToString()))
+                errorMessage += $"{ex.InnerException}";
+
+            errorMessage += $"\n\n{ ex.Message}";
+
+            errorMessage += "\n\nSee error log file for further information.";
+
+            var fileName = "Error[" + DateTime.Now.ToString("dd.MM.yyyy-HH_mm_ss") + "].txt";
+
+
+            TextWriter writer = new StreamWriter(Path.Combine(App.ExeDir, fileName));
+            writer.WriteLine("-------------- Exception --------------\n\n");
+            writer.WriteLine(ex.Message);
+            writer.WriteLine("\n\n-------------- Inner Exception --------------\n\n");
+            writer.WriteLine(ex.InnerException);
+            writer.WriteLine("\n\n-------------- Stack Trace --------------\n\n");
+            writer.WriteLine(ex.StackTrace);
+            writer.Close();
+
+            MessageBox.Show(errorMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            Application.Current.Shutdown();
+        }
 
     }
 }
