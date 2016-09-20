@@ -72,7 +72,7 @@ namespace InstaRun
             window.MouseLeftButtonDown += Window_MouseLeftButtonDown;
             window.Topmost = true;
             window.Left = 0;
-            window.Top = -19;
+            window.Top = -18;
             window.Height = 20;
             window.Width = 10000;
             window.ShowInTaskbar = false;
