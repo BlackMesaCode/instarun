@@ -47,9 +47,6 @@ namespace InstaRun
                 App.Current.Shutdown();
             }
             
-            // Create invisible window to catch clicks
-            //CreateInvisibleWindow();
-
             // Add Exit Handler to dispose tray menu
             Exit += App_Exit;
 
@@ -63,10 +60,6 @@ namespace InstaRun
             // Create NotifyIcon in the tray menu
             TrayManager = new TrayManager();
 
-            // Intercept MouseButtonDown event to open ContextMenu
-            //MouseHook = new MouseHook();
-            //MouseHook.ButtonDown += MouseHook_ButtonDown;
-
             // Watching Config.xml for changes
             CreateFileWatcher(ExeDir);
 
@@ -76,28 +69,20 @@ namespace InstaRun
 
         private void OnHotkeyPressed(HotKey obj)
         {
+            if (Reinitialize)
+            {
+                Initialize();
+                Reinitialize = false;
+            }
+
+            ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.MousePoint;
+            ContextMenu.HorizontalOffset = 0;
+            ContextMenu.VerticalOffset = 0;
             ContextMenu.IsOpen = !ContextMenu.IsOpen;
         }
 
-        private void CreateInvisibleWindow()
-        {
-            var window = new Window();
-            window.WindowStyle = WindowStyle.None;
-            window.AllowsTransparency = true;
-            window.Opacity = 0.01;
-            window.MouseLeftButtonDown += Window_MouseLeftButtonDown;
-            window.Topmost = true;
-            window.Left = 0;
-            window.Top = -19.5;
-            window.Height = 20;
-            window.Width = 10000;
-            window.ShowInTaskbar = false;
-            window.ResizeMode = ResizeMode.NoResize;
-            window.Cursor = Cursors.ScrollS;
-            window.Show();
-        }
 
-        public void Initialize()
+        public static void Initialize()
         {
             // Deserialize config.xml
             Config = ConfigManager.GetConfig();
@@ -105,29 +90,24 @@ namespace InstaRun
             // Generate the ContextMenu out of the config object
             ContextMenu = ContextMenuManager.CreateContextMenu(Config.Items);
 
+            // If TrayManager has already been created: reassign updated context menu
+            if (TrayManager != null)
+                TrayManager.TaskbarIcon.ContextMenu = ContextMenu;
+
             // Update application settings
             UpdateSettings(Config.Settings);
         }
 
-        private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            if (Reinitialize)
-            {
-                Initialize();
-                Reinitialize = false;
-            }
-
-            ContextMenu.IsOpen = true;
-        }
 
         private void App_Exit(object sender, ExitEventArgs e)
         {
-            TrayManager.NotifyIcon.Icon = null; // Dispose NotifyIcon in the tray
+            TrayManager.TaskbarIcon.Icon = null; // Dispose NotifyIcon in the tray
+            TrayManager.TaskbarIcon.Dispose();
         }
 
 
 
-        public void UpdateSettings(Settings settings)
+        public static void UpdateSettings(Settings settings)
         {
             // Warning: MaxWidth must not be 0 otherwise, we wont see shit
             // Setting the MaxWidth only on the Root ContextMenu wont be enough - we would have to set it on each menuitem

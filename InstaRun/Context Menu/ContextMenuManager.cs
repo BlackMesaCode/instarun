@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -25,20 +26,11 @@ namespace InstaRun
             var contextMenu = new ContextMenu();
             CreateContextMenuHelper(contextMenu, null, items);
 
-            // add close option
-            var menuItemToClose = new MenuItem();
-            menuItemToClose.DataContext = contextMenu;
-            menuItemToClose.Header = "Close";
-            menuItemToClose.Click += MenuItemToClose_Click;
-            contextMenu.Items.Add(menuItemToClose);
+            AddSettingsMenu(contextMenu);
+
             return contextMenu;
         }
 
-        private static void MenuItemToClose_Click(object sender, RoutedEventArgs e)
-        {
-            var contextMenu = (sender as MenuItem).DataContext as ContextMenu;
-            contextMenu.IsOpen = false;
-        }
 
         public static void CreateContextMenuHelper(ContextMenu contextMenu, MenuItem parent, List<Item> items)
         {
@@ -124,6 +116,125 @@ namespace InstaRun
             }
 
         }
+
+
+
+        private static void AddSettingsMenu(ContextMenu contextMenu)
+        {
+            //add separator
+            var separator = new System.Windows.Controls.Separator();
+            contextMenu.Items.Add(separator);
+
+            //add settings container
+            var settingsContainer = new MenuItem();
+            settingsContainer.Header = "Settings";
+            contextMenu.Items.Add(settingsContainer);
+
+            // add start with windows
+            var startWithWindowsMenuItem = new MenuItem();
+            startWithWindowsMenuItem.Header = "Autorun";
+            startWithWindowsMenuItem.IsCheckable = true;
+            startWithWindowsMenuItem.IsChecked = IsStartingWithWindows();
+            startWithWindowsMenuItem.DataContext = startWithWindowsMenuItem.IsChecked;
+            startWithWindowsMenuItem.Click += StartWithWindowsMenuItem_Click;
+            settingsContainer.Items.Add(startWithWindowsMenuItem);
+
+            // Open config folder
+            var openConfigFolderMenuItem = new MenuItem();
+            openConfigFolderMenuItem.Header = "Open config folder";
+            openConfigFolderMenuItem.Click += OpenConfigFolderMenuItem_Click;
+            settingsContainer.Items.Add(openConfigFolderMenuItem);
+
+            // Reload config
+            var reloadConfigMenuItem = new MenuItem();
+            reloadConfigMenuItem.Header = "Reload config";
+            reloadConfigMenuItem.Click += ReloadConfigMenuItem_Click;
+            settingsContainer.Items.Add(reloadConfigMenuItem);
+
+            // Restart
+            var restartMenuItem = new MenuItem();
+            restartMenuItem.Header = "Restart";
+            restartMenuItem.Click += RestartMenuItem_Click;
+            settingsContainer.Items.Add(restartMenuItem);
+
+            // Close ContextMenu - not really neccessary anymore
+            //var closeMenuItem = new MenuItem();
+            //closeMenuItem.DataContext = contextMenu;
+            //closeMenuItem.Header = "Close";
+            //closeMenuItem.Click += MenuItemToClose_Click;
+            //settingsContainer.Items.Add(closeMenuItem);
+
+            // Close application
+            var closeApplicationMenuItem = new MenuItem();
+            closeApplicationMenuItem.Header = "Close";
+            closeApplicationMenuItem.Click += CloseApplicationMenuItem_Click;
+            settingsContainer.Items.Add(closeApplicationMenuItem);
+        }
+
+
+        private static void StartWithWindowsMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var menuItem = (e.Source as MenuItem);
+            RegistryKey registryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+            if (menuItem.IsChecked)
+            {
+                registryKey.SetValue("InstaRun", "\"" + App.ExePath + "\"");
+            }
+            else
+            {
+                registryKey.DeleteValue("InstaRun", false);
+            }
+        }
+
+        private static void MenuItemToClose_Click(object sender, RoutedEventArgs e)
+        {
+            var contextMenu = (sender as MenuItem).DataContext as ContextMenu;
+            contextMenu.IsOpen = false;
+        }
+
+        public static bool IsStartingWithWindows()
+        {
+            RegistryKey registryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
+            return (registryKey.GetValue("InstaRun") != null);
+        }
+
+        private static void ReloadConfigMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            App.Initialize();
+        }
+
+        private static void OpenConfigFolderMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start("explorer.exe", App.ExeDir);
+        }
+
+        private static void RestartMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start(App.ExePath);
+            App.Current.Shutdown();
+        }
+
+        private static void CloseApplicationMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            App.Current.Shutdown();
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 
     internal static class IconUtilities

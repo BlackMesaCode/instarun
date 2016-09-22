@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using Hardcodet.Wpf.TaskbarNotification;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,71 +13,24 @@ namespace InstaRun
 {
     public class TrayManager
     {
-        public NotifyIcon NotifyIcon;
+        public TaskbarIcon TaskbarIcon;
 
         public TrayManager()
         {
-            NotifyIcon = new NotifyIcon();
-            NotifyIcon.ContextMenu = CreateContextMenu();
-            NotifyIcon.Icon = new System.Drawing.Icon(Path.Combine(App.ExeDir, "InstaRun.ico"));
-            NotifyIcon.Visible = true;
-            NotifyIcon.Click += NotifyIcon_Click;
+            TaskbarIcon = new TaskbarIcon();
+            TaskbarIcon.ContextMenu = App.ContextMenu;
+            TaskbarIcon.Visibility = System.Windows.Visibility.Visible;
+            TaskbarIcon.Icon = new System.Drawing.Icon(Path.Combine(App.ExeDir, "InstaRun.ico"));
+            TaskbarIcon.TrayRightMouseDown += TaskbarIcon_TrayRightMouseDown;
         }
 
-        private void NotifyIcon_Click(object sender, EventArgs e)
+        private void TaskbarIcon_TrayRightMouseDown(object sender, System.Windows.RoutedEventArgs e)
         {
-            App.ContextMenu.IsOpen = !App.ContextMenu.IsOpen;
-        }
-
-        private ContextMenu CreateContextMenu()
-        {
-            var contextMenu = new ContextMenu();
-            contextMenu.MenuItems.Add(new MenuItem("Start with Windows", StartWithWindows) {
-                Checked = IsStartingWithWindows(),
-            });
-            contextMenu.MenuItems.Add(new MenuItem("Open Folder", OpenFolder));
-            contextMenu.MenuItems.Add(new MenuItem("Restart", Restart));
-            contextMenu.MenuItems.Add(new MenuItem("Close", Close));
-            return contextMenu;
-        }
-
-
-        private void StartWithWindows(object sender, EventArgs e)
-        {
-            var menuItem = (sender as MenuItem);
-            RegistryKey registryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-            if (menuItem.Checked)
+            if (App.Reinitialize)
             {
-                registryKey.DeleteValue("InstaRun", false);
-                menuItem.Checked = false;
+                App.Initialize();
+                App.Reinitialize = false;
             }
-            else
-            {
-                registryKey.SetValue("InstaRun", "\"" + Application.ExecutablePath.ToString() + "\"");
-                menuItem.Checked = true;
-            }
-        }
-
-        private void OpenFolder(object sender, EventArgs e)
-        {
-            Process.Start("explorer.exe", App.ExeDir);
-        }
-
-        private void Restart(object sender, EventArgs e)
-        {
-            Process.Start(App.ExePath);
-            App.Current.Shutdown();
-        }
-
-        public bool IsStartingWithWindows()
-        {
-            RegistryKey registryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
-            return (registryKey.GetValue("InstaRun") != null);
-        }
-
-        private void Close(object sender, EventArgs e)
-        {
-            App.Current.Shutdown();
         }
     }
 }
