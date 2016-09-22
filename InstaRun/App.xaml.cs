@@ -48,7 +48,7 @@ namespace InstaRun
             }
 
             // Create invisible window to catch clicks
-            CreateInvisibleWindow();
+            //CreateInvisibleWindow();
 
             // Add Exit Handler to dispose tray menu
             Exit += App_Exit;
@@ -69,8 +69,15 @@ namespace InstaRun
 
             // Watching Config.xml for changes
             CreateFileWatcher(ExeDir);
+
+            // Register Hotkey to Open Context Menu
+            var hotkey = new HotKey(Key.W, KeyModifier.Win, OnHotkeyPressed);
         }
 
+        private void OnHotkeyPressed(HotKey obj)
+        {
+            ContextMenu.IsOpen = !ContextMenu.IsOpen;
+        }
 
         private void CreateInvisibleWindow()
         {
