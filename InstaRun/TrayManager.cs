@@ -20,6 +20,12 @@ namespace InstaRun
             NotifyIcon.ContextMenu = CreateContextMenu();
             NotifyIcon.Icon = new System.Drawing.Icon(Path.Combine(App.ExeDir, "InstaRun.ico"));
             NotifyIcon.Visible = true;
+            NotifyIcon.Click += NotifyIcon_Click;
+        }
+
+        private void NotifyIcon_Click(object sender, EventArgs e)
+        {
+            App.ContextMenu.IsOpen = !App.ContextMenu.IsOpen;
         }
 
         private ContextMenu CreateContextMenu()

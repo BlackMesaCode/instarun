@@ -46,7 +46,7 @@ namespace InstaRun
                 MessageBox.Show($"Couldn't find: {PathToConfig}\n\nProgram will be closed.");
                 App.Current.Shutdown();
             }
-
+            
             // Create invisible window to catch clicks
             //CreateInvisibleWindow();
 
