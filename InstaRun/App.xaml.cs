@@ -85,6 +85,7 @@ namespace InstaRun
                 ContextMenu.VerticalOffset = 0;
                 ContextMenu.IsOpen = !ContextMenu.IsOpen;
             }
+            e.Handled = true;
         }
 
 
