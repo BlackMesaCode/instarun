@@ -20,6 +20,7 @@ namespace InstaRun
         public static ContextMenu ContextMenu;
         public static TrayManager TrayManager;
         public static Config Config;
+        public static KeyboardHook KeyboardHook;
 
         public static readonly string ExePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
         public static readonly string ExeDir = Path.GetDirectoryName(ExePath);
@@ -64,21 +65,26 @@ namespace InstaRun
             CreateFileWatcher(ExeDir);
 
             // Register Hotkey to Open Context Menu
-            var hotkey = new HotKey(Key.W, KeyModifier.Win, OnHotkeyPressed);
+            KeyboardHook = new KeyboardHook();
+            KeyboardHook.KeyDown += KeyboardHook_KeyDown;
+
         }
 
-        private void OnHotkeyPressed(HotKey obj)
+        private void KeyboardHook_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
         {
-            if (Reinitialize)
+            if (e.KeyCode == System.Windows.Forms.Keys.W && KeyboardHook.IsKeyPressed(System.Windows.Forms.Keys.LWin))
             {
-                Initialize();
-                Reinitialize = false;
-            }
+                if (Reinitialize)
+                {
+                    Initialize();
+                    Reinitialize = false;
+                }
 
-            ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.MousePoint;
-            ContextMenu.HorizontalOffset = 0;
-            ContextMenu.VerticalOffset = 0;
-            ContextMenu.IsOpen = !ContextMenu.IsOpen;
+                ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.MousePoint;
+                ContextMenu.HorizontalOffset = 0;
+                ContextMenu.VerticalOffset = 0;
+                ContextMenu.IsOpen = !ContextMenu.IsOpen;
+            }
         }
 
 

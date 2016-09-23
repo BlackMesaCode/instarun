@@ -72,7 +72,7 @@
     <Compile Include="Context Menu\Item.cs" />
     <Compile Include="Context Menu\Separator.cs" />
     <Compile Include="Config\Settings.cs" />
-    <Compile Include="Hotkey.cs" />
+    <Compile Include="KeyboardHook.cs" />
     <Compile Include="TrayManager.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
