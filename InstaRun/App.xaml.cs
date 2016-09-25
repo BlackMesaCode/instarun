@@ -79,7 +79,7 @@ namespace InstaRun
                     Reinitialize = false;
                 }
 
-                ToggleContextMenuAtMousePoint(_contextMenu);
+                ToggleContextMenuAtMousePoint();
 
                 e.Handled = true;
             }
@@ -88,12 +88,12 @@ namespace InstaRun
         }
 
 
-        private void ToggleContextMenuAtMousePoint(ContextMenu contextMenu)
+        private void ToggleContextMenuAtMousePoint()
         {
-            contextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.MousePoint;
-            contextMenu.HorizontalOffset = 0;
-            contextMenu.VerticalOffset = 0;
-            contextMenu.IsOpen = !_contextMenu.IsOpen;
+            _contextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.MousePoint;
+            _contextMenu.HorizontalOffset = 0;
+            _contextMenu.VerticalOffset = 0;
+            _contextMenu.IsOpen = !_contextMenu.IsOpen;
         }
 
 
