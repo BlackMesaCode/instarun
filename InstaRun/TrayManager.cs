@@ -13,30 +13,39 @@ namespace InstaRun
 {
     public class TrayManager
     {
-        public TaskbarIcon TaskbarIcon;
+        private TaskbarIcon _taskbarIcon;
+        private App _app;
 
-        public TrayManager()
+        public TrayManager(App app)
         {
-            TaskbarIcon = new TaskbarIcon();
-            TaskbarIcon.ContextMenu = App.ContextMenu;
-            TaskbarIcon.Visibility = System.Windows.Visibility.Visible;
-            TaskbarIcon.Icon = new System.Drawing.Icon(Path.Combine(App.ExeDir, "InstaRun.ico"));
-            TaskbarIcon.TrayRightMouseDown += TaskbarIcon_TrayRightMouseDown;
+            _app = app;
 
-            App.ContextMenuChanged += App_ContextMenuChanged;
+            app.Exit += App_Exit;
+            app.ContextMenuChanged += App_ContextMenuChanged;
+
+            _taskbarIcon = new TaskbarIcon();
+            _taskbarIcon.Visibility = System.Windows.Visibility.Visible;
+            _taskbarIcon.Icon = new System.Drawing.Icon(Path.Combine(App.ExeDir, "InstaRun.ico"));
+            _taskbarIcon.TrayRightMouseDown += TaskbarIcon_TrayRightMouseDown;
         }
 
-        private void App_ContextMenuChanged(System.Windows.Controls.ContextMenu newConfig)
+        private void App_Exit(object sender, System.Windows.ExitEventArgs e)
         {
-            TaskbarIcon.ContextMenu = App.ContextMenu;
+            _taskbarIcon.Icon = null; // Dispose NotifyIcon in the tray
+            _taskbarIcon.Dispose();
+        }
+
+        private void App_ContextMenuChanged(System.Windows.Controls.ContextMenu newContextMenu)
+        {
+            _taskbarIcon.ContextMenu = newContextMenu;
         }
 
         private void TaskbarIcon_TrayRightMouseDown(object sender, System.Windows.RoutedEventArgs e)
         {
-            if (App.Reinitialize)
+            if (_app.Reinitialize)
             {
-                App.Initialize();
-                App.Reinitialize = false;
+                _app.Initialize();
+                _app.Reinitialize = false;
             }
         }
     }

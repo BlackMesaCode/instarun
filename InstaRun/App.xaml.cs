@@ -17,13 +17,13 @@ namespace InstaRun
     /// </summary>
     public partial class App : Application
     {
-        public static ContextMenu ContextMenu;
-        public static TrayManager TrayManager;
-        public static Config Config;
-        public static KeyboardHook KeyboardHook;
+        private ContextMenu _contextMenu;
+        private TrayManager _trayManager;
+        private Config _config;
+        private KeyboardHook _keyboardHook;
 
         public delegate void ContextMenuChangedHandler(ContextMenu newConfig);
-        public static event ContextMenuChangedHandler ContextMenuChanged;
+        public event ContextMenuChangedHandler ContextMenuChanged;
 
         public static readonly string ExePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
         public static readonly string ExeDir = Path.GetDirectoryName(ExePath);
@@ -32,9 +32,8 @@ namespace InstaRun
         public static readonly string IconCacheFolderName = "IconCache";
         public static readonly string PathToConfig = Path.Combine(ExeDir, ConfigFileName);
         public static readonly string PathToSampleConfig = Path.Combine(ExeDir, SampleConfigFileName);
-        public static readonly string PathToIconCache = Path.Combine(ExeDir, IconCacheFolderName);
 
-        public static bool Reinitialize = false;
+        public bool Reinitialize = false;
 
         public App()
         {
@@ -50,32 +49,29 @@ namespace InstaRun
                 MessageBox.Show($"Couldn't find: {PathToConfig}\n\nProgram will be closed.");
                 App.Current.Shutdown();
             }
-            
-            // Add Exit Handler to dispose tray menu
-            Exit += App_Exit;
 
             // Deserialize Config.xml to a config object
             // (just in case someone accidently deleted the config.xml and doesnt remember the xml schema)
             ConfigManager.CreateSampleConfigXml();
 
+            // Create NotifyIcon in the tray menu
+            _trayManager = new TrayManager(this);
+
             // Deserialize config.xml and build context menu
             Initialize();
-
-            // Create NotifyIcon in the tray menu
-            TrayManager = new TrayManager();
 
             // Watching Config.xml for changes
             CreateFileWatcher(ExeDir);
 
             // Register Hotkey to Open Context Menu
-            KeyboardHook = new KeyboardHook();
-            KeyboardHook.KeyDown += KeyboardHook_KeyDown;
+            _keyboardHook = new KeyboardHook();
+            _keyboardHook.KeyDown += KeyboardHook_KeyDown;
 
         }
 
         private void KeyboardHook_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
         {
-            if (e.KeyCode == System.Windows.Forms.Keys.W && KeyboardHook.IsKeyPressed(System.Windows.Forms.Keys.LWin))
+            if (e.KeyCode == System.Windows.Forms.Keys.W && _keyboardHook.IsKeyPressed(System.Windows.Forms.Keys.LWin))
             {
                 if (Reinitialize)
                 {
@@ -83,7 +79,7 @@ namespace InstaRun
                     Reinitialize = false;
                 }
 
-                ToggleContextMenuAtMousePoint(ContextMenu);
+                ToggleContextMenuAtMousePoint(_contextMenu);
 
                 e.Handled = true;
             }
@@ -97,24 +93,18 @@ namespace InstaRun
             contextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.MousePoint;
             contextMenu.HorizontalOffset = 0;
             contextMenu.VerticalOffset = 0;
-            contextMenu.IsOpen = !ContextMenu.IsOpen;
+            contextMenu.IsOpen = !_contextMenu.IsOpen;
         }
 
 
-        public static void Initialize()
+        public void Initialize()
         {
             // Update Config
-            Config = ConfigManager.ReadConfigFromXml();
+            _config = ConfigManager.ReadConfigFromXml();
+
             // Generate the ContextMenu out of the config object
-            ContextMenu = ContextMenuFactory.Create(Config);
-            ContextMenuChanged?.Invoke(ContextMenu);
-        }
-
-
-        private void App_Exit(object sender, ExitEventArgs e)
-        {
-            TrayManager.TaskbarIcon.Icon = null; // Dispose NotifyIcon in the tray
-            TrayManager.TaskbarIcon.Dispose();
+            _contextMenu = ContextMenuFactory.Create(_config, this);
+            ContextMenuChanged?.Invoke(_contextMenu);
         }
 
 
@@ -142,7 +132,6 @@ namespace InstaRun
         {
             // Reinitialize if config.xml has changed
             Reinitialize = true;
-            
         }
 
 

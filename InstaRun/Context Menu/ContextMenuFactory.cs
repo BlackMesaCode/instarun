@@ -21,8 +21,12 @@ namespace InstaRun
     public static class ContextMenuFactory
     {
 
-        public static ContextMenu Create(Config config)
+        private static App _app;
+
+        public static ContextMenu Create(Config config, App app)
         {
+            _app = app;
+
             // Custom settings could be read from config.Settings if there were any ...
 
             var contextMenu = new ContextMenu();
@@ -202,7 +206,7 @@ namespace InstaRun
 
         private static void ReloadConfigMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            App.Initialize();
+            _app.Initialize();
         }
 
         private static void OpenConfigFolderMenuItem_Click(object sender, RoutedEventArgs e)
