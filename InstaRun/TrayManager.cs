@@ -20,19 +20,12 @@ namespace InstaRun
         {
             _app = app;
 
-            app.Exit += App_Exit;
             app.ContextMenuChanged += App_ContextMenuChanged;
 
             _taskbarIcon = new TaskbarIcon();
             _taskbarIcon.Visibility = System.Windows.Visibility.Visible;
             _taskbarIcon.Icon = new System.Drawing.Icon(Path.Combine(App.ExeDir, "InstaRun.ico"));
             _taskbarIcon.TrayRightMouseDown += TaskbarIcon_TrayRightMouseDown;
-        }
-
-        private void App_Exit(object sender, System.Windows.ExitEventArgs e)
-        {
-            _taskbarIcon.Icon = null; // Dispose NotifyIcon in the tray
-            _taskbarIcon.Dispose();
         }
 
         private void App_ContextMenuChanged(System.Windows.Controls.ContextMenu newContextMenu)
