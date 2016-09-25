@@ -35,7 +35,7 @@ namespace InstaRun
         }
 
 
-        public static Config GetConfig()
+        public static Config ReadConfigFromXml()
         {
             return Deserialize<Config>(App.PathToConfig);
         }
@@ -51,7 +51,7 @@ namespace InstaRun
         }
 
 
-        public static T Deserialize<T>(string path)
+        private static T Deserialize<T>(string path)
         {
             try
             {
@@ -73,7 +73,7 @@ namespace InstaRun
         }
 
 
-        public static void Serialize<T>(T objectToSerialize, string path)
+        private static void Serialize<T>(T objectToSerialize, string path)
         {
             XmlSerializer xs = new XmlSerializer(typeof(T));
             var writerSettings = new XmlWriterSettings

@@ -22,6 +22,9 @@ namespace InstaRun
         public static Config Config;
         public static KeyboardHook KeyboardHook;
 
+        public delegate void ContextMenuChangedHandler(ContextMenu newConfig);
+        public static event ContextMenuChangedHandler ContextMenuChanged;
+
         public static readonly string ExePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
         public static readonly string ExeDir = Path.GetDirectoryName(ExePath);
         public static readonly string ConfigFileName = "Config.xml";
@@ -80,29 +83,31 @@ namespace InstaRun
                     Reinitialize = false;
                 }
 
-                ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.MousePoint;
-                ContextMenu.HorizontalOffset = 0;
-                ContextMenu.VerticalOffset = 0;
-                ContextMenu.IsOpen = !ContextMenu.IsOpen;
+                ToggleContextMenuAtMousePoint(ContextMenu);
+
+                e.Handled = true;
             }
-            e.Handled = true;
+            else
+                e.Handled = false;
+        }
+
+
+        private void ToggleContextMenuAtMousePoint(ContextMenu contextMenu)
+        {
+            contextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.MousePoint;
+            contextMenu.HorizontalOffset = 0;
+            contextMenu.VerticalOffset = 0;
+            contextMenu.IsOpen = !ContextMenu.IsOpen;
         }
 
 
         public static void Initialize()
         {
-            // Deserialize config.xml
-            Config = ConfigManager.GetConfig();
-
+            // Update Config
+            Config = ConfigManager.ReadConfigFromXml();
             // Generate the ContextMenu out of the config object
-            ContextMenu = ContextMenuManager.CreateContextMenu(Config.Items);
-
-            // If TrayManager has already been created: reassign updated context menu
-            if (TrayManager != null)
-                TrayManager.TaskbarIcon.ContextMenu = ContextMenu;
-
-            // Update application settings
-            UpdateSettings(Config.Settings);
+            ContextMenu = ContextMenuFactory.Create(Config);
+            ContextMenuChanged?.Invoke(ContextMenu);
         }
 
 
@@ -112,14 +117,6 @@ namespace InstaRun
             TrayManager.TaskbarIcon.Dispose();
         }
 
-
-
-        public static void UpdateSettings(Settings settings)
-        {
-            // Warning: MaxWidth must not be 0 otherwise, we wont see shit
-            // Setting the MaxWidth only on the Root ContextMenu wont be enough - we would have to set it on each menuitem
-            //ContextMenu.MaxWidth = settings.MaxWidth;
-        }
 
         public void CreateFileWatcher(string path)
         {
@@ -145,6 +142,7 @@ namespace InstaRun
         {
             // Reinitialize if config.xml has changed
             Reinitialize = true;
+            
         }
 
 

@@ -18,13 +18,15 @@ using System.Windows.Media.Imaging;
 
 namespace InstaRun
 {
-    public static class ContextMenuManager
+    public static class ContextMenuFactory
     {
 
-        public static ContextMenu CreateContextMenu(List<Item> items)
+        public static ContextMenu Create(Config config)
         {
+            // Custom settings could be read from config.Settings if there were any ...
+
             var contextMenu = new ContextMenu();
-            CreateContextMenuHelper(contextMenu, null, items);
+            CreateContextMenuHelper(contextMenu, null, config.Items);
 
             AddSettingsMenu(contextMenu);
 

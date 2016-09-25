@@ -22,6 +22,13 @@ namespace InstaRun
             TaskbarIcon.Visibility = System.Windows.Visibility.Visible;
             TaskbarIcon.Icon = new System.Drawing.Icon(Path.Combine(App.ExeDir, "InstaRun.ico"));
             TaskbarIcon.TrayRightMouseDown += TaskbarIcon_TrayRightMouseDown;
+
+            App.ContextMenuChanged += App_ContextMenuChanged;
+        }
+
+        private void App_ContextMenuChanged(System.Windows.Controls.ContextMenu newConfig)
+        {
+            TaskbarIcon.ContextMenu = App.ContextMenu;
         }
 
         private void TaskbarIcon_TrayRightMouseDown(object sender, System.Windows.RoutedEventArgs e)
