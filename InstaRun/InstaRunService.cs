@@ -18,20 +18,23 @@ namespace InstaRun
         private TaskbarService _taskbarService;
         private HotkeyService _hotkeyService;
 
-        public InstaRunService()
+        public InstaRunService(
+            ConfigService configService, 
+            ContextMenuService contextMenuService, 
+            TaskbarService taskbarService, 
+            HotkeyService hotkeyService)
         {
             // Update current working environment, because it is wrongly set, when the app is started from the registry run
             Environment.CurrentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
-            _configService = new ConfigService();
-            _contextMenuService = new ContextMenuService(_configService);
-            _taskbarService = new TaskbarService(_contextMenuService);
-            _hotkeyService = new HotkeyService(_contextMenuService);
+            _configService = configService;
+            _contextMenuService = contextMenuService;
+            _taskbarService = taskbarService;
+            _hotkeyService = hotkeyService;
 
             // manually triggering the event chain: ConfigChanged -> Create ContextMenu -> ContextMenuChanged -> UpdateTaskbar
             _configService.UpdateConfigFromXml();
 
-            
         }
 
     }

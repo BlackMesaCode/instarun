@@ -1,4 +1,8 @@
-﻿using InstaRun.GlobalExceptionHandling;
+﻿using InstaRun.ConfigManagement;
+using InstaRun.ContextMenuManagement;
+using InstaRun.GlobalExceptionHandling;
+using InstaRun.HotkeyManagement;
+using Ninject;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -8,7 +12,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace InstaRun
@@ -32,10 +35,17 @@ namespace InstaRun
             _globalExceptionHandler.ExceptionLoggers.Add(new TextFileLogger(LogDirPath));
             _globalExceptionHandler.ExceptionLoggers.Add(new MessageBoxLogger());
 
-            _instaRunService = new InstaRunService();
 
-            // Add IoC Container
+            var kernel = new StandardKernel();
 
+            kernel.Bind<ConfigService>().To<ConfigService>().InSingletonScope();
+            kernel.Bind<ContextMenuService>().To<ContextMenuService>().InSingletonScope();
+            kernel.Bind<TaskbarService>().To<TaskbarService>().InSingletonScope();
+            kernel.Bind<HotkeyService>().To<HotkeyService>().InSingletonScope();
+            kernel.Bind<KeyboardHook>().To<KeyboardHook>().InSingletonScope();
+
+
+            _instaRunService = kernel.Get<InstaRunService>();
         }
 
  

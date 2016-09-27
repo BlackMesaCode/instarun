@@ -12,12 +12,12 @@ namespace InstaRun.HotkeyManagement
         private ContextMenuService _contextMenuService;
         private KeyboardHook _keyboardHook;
 
-        public HotkeyService(ContextMenuService contextMenuService)
+        public HotkeyService(ContextMenuService contextMenuService, KeyboardHook keyboardHook)
         {
             _contextMenuService = contextMenuService;
 
             // Register Hotkey to Open Context Menu
-            _keyboardHook = new KeyboardHook();
+            _keyboardHook = keyboardHook;
             _keyboardHook.KeyDown += KeyboardHook_KeyDown;
         }
 
