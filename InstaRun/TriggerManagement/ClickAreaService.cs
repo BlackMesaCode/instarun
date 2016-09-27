@@ -4,6 +4,7 @@ using SharpDX.Multimedia;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -20,24 +21,71 @@ namespace InstaRun.TriggerManagement
         public ClickAreaService(ContextMenuService contextMenuService)
         {
             _contextMenuService = contextMenuService;
-            Subscribe();
+            CreateFormsWindow();
+            //CreateInvisibleWindow();
+            //Subscribe();
         }
 
-        private IKeyboardMouseEvents m_GlobalHook;
-        int _procId;
+        //private IKeyboardMouseEvents m_GlobalHook;
+        //int _procId;
 
-        public void Subscribe()
+        //public void Subscribe()
+        //{
+        //    // Note: for the application hook, use the Hook.AppEvents() instead
+        //    //m_GlobalHook = Hook.GlobalEvents();
+
+        //    //_procId = Process.GetCurrentProcess().Id;
+
+        //    //m_GlobalHook.MouseDownExt += GlobalHookMouseDownExt;
+        //    //m_GlobalHook.MouseMoveExt += M_GlobalHook_MouseMoveExt;
+        //    //m_GlobalHook.MouseClick += M_GlobalHook_MouseClick;
+
+        //}
+
+        private void CreateFormsWindow()
         {
-            // Note: for the application hook, use the Hook.AppEvents() instead
-            m_GlobalHook = Hook.GlobalEvents();
-
-            _procId = Process.GetCurrentProcess().Id;
-
-            //m_GlobalHook.MouseDownExt += GlobalHookMouseDownExt;
-            m_GlobalHook.MouseMoveExt += M_GlobalHook_MouseMoveExt;
-            //m_GlobalHook.MouseClick += M_GlobalHook_MouseClick;
-
+            var window = new Form();
+            window.FormBorderStyle = FormBorderStyle.None;
+            window.StartPosition = FormStartPosition.Manual;
+            window.MinimumSize = new Size(1,1);
+            window.AllowTransparency = true;
+            window.TransparencyKey = Color.AliceBlue;
+            window.BackColor = Color.AliceBlue;
+            window.TopMost = true;
+            window.ShowInTaskbar = false;
+            window.MouseClick += Window_MouseClick;
+            window.TopLevel = true;
+            window.Bounds = new Rectangle(0, -17, 2*1920, 1);
+            window.Cursor = Cursors.UpArrow;
+            window.Show();
         }
+
+        private void Window_MouseClick(object sender, MouseEventArgs e)
+        {
+            _contextMenuService.ToggleContextMenuAtMousePoint();
+        }
+
+        //private void CreateInvisibleWindow()
+        //{
+        //    var window = new Window();
+        //    window.WindowStyle = WindowStyle.None;
+        //    window.AllowsTransparency = true;
+        //    window.Opacity = 0.01;
+        //    window.MouseLeftButtonDown += Window_MouseLeftButtonDown;
+        //    window.Topmost = true;
+        //    window.Left = 0;
+        //    window.Top = -19;
+        //    window.Height = 20;
+        //    window.Width = 10000;
+        //    window.ShowInTaskbar = false;
+        //    window.Cursor = Cursors.ScrollS;
+        //    window.Show();
+        //}
+
+        //private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        //{
+        //    _contextMenuService.ToggleContextMenuAtMousePoint();
+        //}
 
         private void Device_MouseInput(object sender, SharpDX.RawInput.MouseInputEventArgs e)
         {
@@ -72,32 +120,32 @@ namespace InstaRun.TriggerManagement
             //}
         }
 
-        private void M_GlobalHook_MouseClick(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left && e.Y == 0)
-            {
-                _contextMenuService.ToggleContextMenuAtMousePoint();
-            }
-        }
+        //private void M_GlobalHook_MouseClick(object sender, MouseEventArgs e)
+        //{
+        //    if (e.Button == MouseButtons.Left && e.Y == 0)
+        //    {
+        //        _contextMenuService.ToggleContextMenuAtMousePoint();
+        //    }
+        //}
 
-        private void GlobalHookMouseDownExt(object sender, MouseEventExtArgs e)
-        {
-            if (e.Button == MouseButtons.Left && e.Y == 0)
-            {
-                _contextMenuService.ToggleContextMenuAtMousePoint();
-            }
+        //private void GlobalHookMouseDownExt(object sender, MouseEventExtArgs e)
+        //{
+        //    if (e.Button == MouseButtons.Left && e.Y == 0)
+        //    {
+        //        _contextMenuService.ToggleContextMenuAtMousePoint();
+        //    }
 
-            // uncommenting the following line will suppress the middle mouse button click
-            // if (e.Buttons == MouseButtons.Middle) { e.Handled = true; }
-        }
+        //    // uncommenting the following line will suppress the middle mouse button click
+        //    // if (e.Buttons == MouseButtons.Middle) { e.Handled = true; }
+        //}
 
-        public void Unsubscribe()
-        {
-            m_GlobalHook.MouseDownExt -= GlobalHookMouseDownExt;
+        //public void Unsubscribe()
+        //{
+        //    m_GlobalHook.MouseDownExt -= GlobalHookMouseDownExt;
 
-            //It is recommened to dispose it
-            m_GlobalHook.Dispose();
-        }
+        //    //It is recommened to dispose it
+        //    m_GlobalHook.Dispose();
+        //}
 
 
 
