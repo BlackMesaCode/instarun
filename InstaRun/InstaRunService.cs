@@ -1,6 +1,6 @@
 ﻿using InstaRun.ConfigManagement;
 using InstaRun.ContextMenuManagement;
-using InstaRun.HotkeyManagement;
+using InstaRun.TriggerManagement;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,12 +17,15 @@ namespace InstaRun
         private ContextMenuService _contextMenuService;
         private TaskbarService _taskbarService;
         private HotkeyService _hotkeyService;
+        private ClickAreaService _clickAreaService;
+
 
         public InstaRunService(
             ConfigService configService, 
             ContextMenuService contextMenuService, 
             TaskbarService taskbarService, 
-            HotkeyService hotkeyService)
+            HotkeyService hotkeyService,
+            ClickAreaService clickAreaService)
         {
             // Update current working environment, because it is wrongly set, when the app is started from the registry run
             Environment.CurrentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -31,6 +34,7 @@ namespace InstaRun
             _contextMenuService = contextMenuService;
             _taskbarService = taskbarService;
             _hotkeyService = hotkeyService;
+            _clickAreaService = clickAreaService;
 
             // manually triggering the event chain: ConfigChanged -> Create ContextMenu -> ContextMenuChanged -> UpdateTaskbar
             _configService.UpdateConfigFromXml();

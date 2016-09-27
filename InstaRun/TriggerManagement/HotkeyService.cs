@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace InstaRun.HotkeyManagement
+namespace InstaRun.TriggerManagement
 {
     public class HotkeyService
     {

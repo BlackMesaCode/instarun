@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace InstaRun.HotkeyManagement
+namespace InstaRun.TriggerManagement
 {
 
     public class KeyboardHook
