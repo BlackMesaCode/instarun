@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using InstaRun.ConfigManagement;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -16,21 +17,37 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace InstaRun
+namespace InstaRun.ContextMenuManagement
 {
-    public static class ContextMenuFactory
+    public class ContextMenuService
     {
+        private ConfigService _configService;
+        private ContextMenu _contextMenu;
 
-        private static App _app;
+        public delegate void ContextMenuChangedHandler(ContextMenu newContextMenu);
+        public event ContextMenuChangedHandler ContextMenuChanged;
 
-        public static ContextMenu Create(Config config, App app)
+        public ContextMenuService(ConfigService configService)
         {
-            _app = app;
+            _configService = configService;
+            _configService.OnConfigChanged += _configService_OnConfigChanged;
+        }
 
+
+        private void _configService_OnConfigChanged(Config newConfig)
+        {
+            
+            _contextMenu = App.Current.Dispatcher.Invoke(() => Create(newConfig.Items));
+            ContextMenuChanged?.Invoke(_contextMenu);
+        }
+
+
+        private ContextMenu Create(List<Item> items)
+        {
             // Custom settings could be read from config.Settings if there were any ...
 
             var contextMenu = new ContextMenu();
-            CreateContextMenuHelper(contextMenu, null, config.Items);
+            CreateContextMenuHelper(contextMenu, null, items);
 
             AddSettingsMenu(contextMenu);
 
@@ -38,7 +55,7 @@ namespace InstaRun
         }
 
 
-        public static void CreateContextMenuHelper(ContextMenu contextMenu, MenuItem parent, List<Item> items)
+        private void CreateContextMenuHelper(ContextMenu contextMenu, MenuItem parent, List<Item> items)
         {
             foreach (var item in items)
             {
@@ -78,7 +95,7 @@ namespace InstaRun
                         parent.Items.Add(newMenuItem);
 
                 }
-                else if (item.GetType() == typeof(InstaRun.Separator))
+                else if (item.GetType() == typeof(Separator))
                 {
                     var newSeparator = new System.Windows.Controls.Separator();
 
@@ -125,7 +142,7 @@ namespace InstaRun
 
 
 
-        private static void AddSettingsMenu(ContextMenu contextMenu)
+        private void AddSettingsMenu(ContextMenu contextMenu)
         {
             //add separator
             var separator = new System.Windows.Controls.Separator();
@@ -178,7 +195,7 @@ namespace InstaRun
         }
 
 
-        private static void StartWithWindowsMenuItem_Click(object sender, RoutedEventArgs e)
+        private void StartWithWindowsMenuItem_Click(object sender, RoutedEventArgs e)
         {
             var menuItem = (e.Source as MenuItem);
             RegistryKey registryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
@@ -192,35 +209,35 @@ namespace InstaRun
             }
         }
 
-        private static void MenuItemToClose_Click(object sender, RoutedEventArgs e)
+        private void MenuItemToClose_Click(object sender, RoutedEventArgs e)
         {
             var contextMenu = (sender as MenuItem).DataContext as ContextMenu;
             contextMenu.IsOpen = false;
         }
 
-        public static bool IsStartingWithWindows()
+        public bool IsStartingWithWindows()
         {
             RegistryKey registryKey = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
             return (registryKey.GetValue("InstaRun") != null);
         }
 
-        private static void ReloadConfigMenuItem_Click(object sender, RoutedEventArgs e)
+        private void ReloadConfigMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            _app.Initialize();
+            _configService.UpdateConfigFromXml();
         }
 
-        private static void OpenConfigFolderMenuItem_Click(object sender, RoutedEventArgs e)
+        private void OpenConfigFolderMenuItem_Click(object sender, RoutedEventArgs e)
         {
             Process.Start("explorer.exe", App.ExeDir);
         }
 
-        private static void RestartMenuItem_Click(object sender, RoutedEventArgs e)
+        private void RestartMenuItem_Click(object sender, RoutedEventArgs e)
         {
             Process.Start(App.ExePath);
             App.Current.Shutdown();
         }
 
-        private static void CloseApplicationMenuItem_Click(object sender, RoutedEventArgs e)
+        private void CloseApplicationMenuItem_Click(object sender, RoutedEventArgs e)
         {
             App.Current.Shutdown();
         }
@@ -230,15 +247,13 @@ namespace InstaRun
 
 
 
-
-
-
-
-
-
-
-
-
+        public void ToggleContextMenuAtMousePoint()
+        {
+            _contextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.MousePoint;
+            _contextMenu.HorizontalOffset = 0;
+            _contextMenu.VerticalOffset = 0;
+            _contextMenu.IsOpen = !_contextMenu.IsOpen;
+        }
 
 
     }

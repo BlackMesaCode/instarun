@@ -1,18 +1,61 @@
-﻿using System;
+﻿using InstaRun.ContextMenuManagement;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace InstaRun
+namespace InstaRun.ConfigManagement
 {
-    public static class ConfigManager
+    public class ConfigService
     {
+        public delegate void OnConfigChangedHandler(Config newConfig);
+        public event OnConfigChangedHandler OnConfigChanged;
 
-        public static Config CreateSampleConfig()
+        private static string _exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
+        private static string _exeDir = Path.GetDirectoryName(_exePath);
+
+        private static string _configFileName = "Config.xml";
+        private static string _configPath = Path.Combine(_exeDir, _configFileName);
+
+        private static string _sampleConfigFileName = "Config.Sample.xml";
+        private static string _sampleConfigPath = Path.Combine(_exeDir, _sampleConfigFileName);
+
+        private FileWatcherService _fileWatcherService;
+
+        private Config _config;
+
+
+        public ConfigService()
+        {
+            // Check if Config.xml exists
+            if (!File.Exists(_configPath))
+            {
+                MessageBox.Show($"Couldn't find: {_configPath}\n\nProgram will be closed.");
+                App.Current.Shutdown();
+            }
+
+            // Create SampleConfig.xml is not already existing
+            CreateSampleConfig();
+
+            // Read config.xml
+            UpdateConfigFromXml();
+
+            // Start watching for changes on the config.xml
+            _fileWatcherService = new FileWatcherService(_configPath);
+            _fileWatcherService.OnChangedAndNotLocked += _fileWatcherService_OnChangedAndNotLocked;
+        }
+
+        private void _fileWatcherService_OnChangedAndNotLocked()
+        {
+            UpdateConfigFromXml();
+        }
+
+        private Config CreateSampleConfig()
         {
             var settings = new Settings();
             var items = new List<Item>()
@@ -35,23 +78,24 @@ namespace InstaRun
         }
 
 
-        public static Config ReadConfigFromXml()
+        public void UpdateConfigFromXml()
         {
-            return Deserialize<Config>(App.PathToConfig);
+            _config = Deserialize<Config>(_configPath);
+            OnConfigChanged?.Invoke(_config);
         }
 
 
-        public static void CreateSampleConfigXml()
+        private void CreateSampleConfigXml()
         {
-            if (!File.Exists(App.PathToSampleConfig))
+            if (!File.Exists(_sampleConfigPath))
             {
                 var objectToSerialize = CreateSampleConfig();
-                Serialize<Config>(objectToSerialize, App.PathToSampleConfig);
+                Serialize<Config>(objectToSerialize, _sampleConfigPath);
             }
         }
 
 
-        private static T Deserialize<T>(string path)
+        private T Deserialize<T>(string path)
         {
             try
             {
@@ -73,7 +117,7 @@ namespace InstaRun
         }
 
 
-        private static void Serialize<T>(T objectToSerialize, string path)
+        private void Serialize<T>(T objectToSerialize, string path)
         {
             XmlSerializer xs = new XmlSerializer(typeof(T));
             var writerSettings = new XmlWriterSettings
@@ -90,6 +134,7 @@ namespace InstaRun
                 xs.Serialize(writer, objectToSerialize);
             }
         }
+
 
     }
 }

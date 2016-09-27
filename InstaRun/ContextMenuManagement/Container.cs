@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-namespace InstaRun
+namespace InstaRun.ContextMenuManagement
 {
     [XmlInclude(typeof(Executable))]
     [XmlInclude(typeof(Separator))]

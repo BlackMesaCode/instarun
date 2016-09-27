@@ -64,21 +64,28 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Config\ConfigManager.cs" />
-    <Compile Include="Context Menu\Container.cs" />
-    <Compile Include="Context Menu\ContextMenuFactory.cs" />
-    <Compile Include="Context Menu\Executable.cs" />
-    <Compile Include="Context Menu\IconReceiver.cs" />
-    <Compile Include="Context Menu\Item.cs" />
-    <Compile Include="Context Menu\Separator.cs" />
-    <Compile Include="Config\Settings.cs" />
-    <Compile Include="KeyboardHook.cs" />
-    <Compile Include="TrayManager.cs" />
+    <Compile Include="ConfigManagement\ConfigService.cs" />
+    <Compile Include="ConfigManagement\FileWatcherService.cs" />
+    <Compile Include="ContextMenuManagement\Container.cs" />
+    <Compile Include="ContextMenuManagement\ContextMenuService.cs" />
+    <Compile Include="ContextMenuManagement\Executable.cs" />
+    <Compile Include="ContextMenuManagement\IconReceiver.cs" />
+    <Compile Include="ContextMenuManagement\Item.cs" />
+    <Compile Include="ContextMenuManagement\Separator.cs" />
+    <Compile Include="ConfigManagement\Settings.cs" />
+    <Compile Include="GlobalExceptionHandling\GlobalExceptionHandler.cs" />
+    <Compile Include="GlobalExceptionHandling\IExceptionLogger.cs" />
+    <Compile Include="GlobalExceptionHandling\MessageBoxLogger.cs" />
+    <Compile Include="GlobalExceptionHandling\TextFileLogger.cs" />
+    <Compile Include="HotkeyManagement\HotkeyService.cs" />
+    <Compile Include="InstaRunService.cs" />
+    <Compile Include="HotkeyManagement\KeyboardHook.cs" />
+    <Compile Include="TaskbarService.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Config\Config.cs" />
+    <Compile Include="ConfigManagement\Config.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

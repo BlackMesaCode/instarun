@@ -1,4 +1,5 @@
-﻿using System;
+﻿using InstaRun.GlobalExceptionHandling;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -17,160 +18,29 @@ namespace InstaRun
     /// </summary>
     public partial class App : Application
     {
-        private ContextMenu _contextMenu;
-        private TrayManager _trayManager;
-        private Config _config;
-        private KeyboardHook _keyboardHook;
-
-        public delegate void ContextMenuChangedHandler(ContextMenu newConfig);
-        public event ContextMenuChangedHandler ContextMenuChanged;
-
         public static readonly string ExePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
         public static readonly string ExeDir = Path.GetDirectoryName(ExePath);
-        public static readonly string ConfigFileName = "Config.xml";
-        public static readonly string SampleConfigFileName = "Config.Sample.xml";
-        public static readonly string IconCacheFolderName = "IconCache";
-        public static readonly string PathToConfig = Path.Combine(ExeDir, ConfigFileName);
-        public static readonly string PathToSampleConfig = Path.Combine(ExeDir, SampleConfigFileName);
+        public static readonly string LogDirName = "ErrorLogs";
+        public static readonly string LogDirPath = Path.Combine(ExeDir, LogDirName);
 
-        public bool Reinitialize = false;
+        private InstaRunService _instaRunService;
+        private GlobalExceptionHandler _globalExceptionHandler;
 
         public App()
         {
-            this.Dispatcher.UnhandledException += OnDispatcherUnhandledException;
-            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            _globalExceptionHandler = new GlobalExceptionHandler(this.Dispatcher);
+            _globalExceptionHandler.ExceptionLoggers.Add(new TextFileLogger(LogDirPath));
+            _globalExceptionHandler.ExceptionLoggers.Add(new MessageBoxLogger());
 
-            // Update current working environment, because it is wrongly set, when the app is started from the registry run
-            Environment.CurrentDirectory = ExeDir;
+            _instaRunService = new InstaRunService();
 
-            // Check if Config.xml exists
-            if (!File.Exists(PathToConfig))
-            {
-                MessageBox.Show($"Couldn't find: {PathToConfig}\n\nProgram will be closed.");
-                App.Current.Shutdown();
-            }
-
-            // Deserialize Config.xml to a config object
-            // (just in case someone accidently deleted the config.xml and doesnt remember the xml schema)
-            ConfigManager.CreateSampleConfigXml();
-
-            // Create NotifyIcon in the tray menu
-            _trayManager = new TrayManager(this);
-
-            // Deserialize config.xml and build context menu
-            Initialize();
-
-            // Watching Config.xml for changes
-            CreateFileWatcher(ExeDir);
-
-            // Register Hotkey to Open Context Menu
-            _keyboardHook = new KeyboardHook();
-            _keyboardHook.KeyDown += KeyboardHook_KeyDown;
+            // Add IoC Container
 
         }
 
-        private void KeyboardHook_KeyDown(object sender, System.Windows.Forms.KeyEventArgs e)
-        {
-            if (e.KeyCode == System.Windows.Forms.Keys.W && _keyboardHook.IsKeyPressed(System.Windows.Forms.Keys.LWin))
-            {
-                if (Reinitialize)
-                {
-                    Initialize();
-                    Reinitialize = false;
-                }
-
-                ToggleContextMenuAtMousePoint();
-
-                e.Handled = true;
-            }
-            else
-                e.Handled = false;
-        }
+ 
 
 
-        private void ToggleContextMenuAtMousePoint()
-        {
-            _contextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.MousePoint;
-            _contextMenu.HorizontalOffset = 0;
-            _contextMenu.VerticalOffset = 0;
-            _contextMenu.IsOpen = !_contextMenu.IsOpen;
-        }
-
-
-        public void Initialize()
-        {
-            // Update Config
-            _config = ConfigManager.ReadConfigFromXml();
-
-            // Generate the ContextMenu out of the config object
-            _contextMenu = ContextMenuFactory.Create(_config, this);
-            ContextMenuChanged?.Invoke(_contextMenu);
-        }
-
-
-        public void CreateFileWatcher(string path)
-        {
-            // Create a new FileSystemWatcher and set its properties.
-            FileSystemWatcher watcher = new FileSystemWatcher();
-            watcher.Path = path;
-            /* Watch for changes in LastAccess and LastWrite times, and 
-               the renaming of files or directories. */
-            watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
-               | NotifyFilters.FileName | NotifyFilters.DirectoryName;
-            // Only watch text files.
-            watcher.Filter = ConfigFileName;
-
-            // Add event handlers.
-            watcher.Changed += new FileSystemEventHandler(OnChanged);
-
-            // Begin watching.
-            watcher.EnableRaisingEvents = true;
-        }
-
-
-        private void OnChanged(object source, FileSystemEventArgs e)
-        {
-            // Reinitialize if config.xml has changed
-            Reinitialize = true;
-        }
-
-
-        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
-        {
-            HandleUncaughtException((Exception)e.ExceptionObject);
-        }
-
-        void OnDispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
-        {
-            HandleUncaughtException(e.Exception);
-        }
-
-        public void HandleUncaughtException(Exception ex)
-        {
-            string errorMessage = string.Empty;
-
-            if (!string.IsNullOrWhiteSpace(ex.InnerException?.ToString()))
-                errorMessage += $"{ex.InnerException}";
-
-            errorMessage += $"\n\n{ ex.Message}";
-
-            errorMessage += "\n\nSee error log file for further information.";
-
-            var fileName = "Error[" + DateTime.Now.ToString("dd.MM.yyyy-HH_mm_ss") + "].txt";
-
-
-            TextWriter writer = new StreamWriter(Path.Combine(App.ExeDir, fileName));
-            writer.WriteLine("-------------- Exception --------------\n\n");
-            writer.WriteLine(ex.Message);
-            writer.WriteLine("\n\n-------------- Inner Exception --------------\n\n");
-            writer.WriteLine(ex.InnerException);
-            writer.WriteLine("\n\n-------------- Stack Trace --------------\n\n");
-            writer.WriteLine(ex.StackTrace);
-            writer.Close();
-
-            MessageBox.Show(errorMessage, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            Application.Current.Shutdown();
-        }
 
     }
 }

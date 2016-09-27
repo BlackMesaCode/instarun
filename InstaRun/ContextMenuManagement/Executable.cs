@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace InstaRun
+namespace InstaRun.ContextMenuManagement
 {
     public class Executable : Item
     {

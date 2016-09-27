@@ -4,10 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace InstaRun
+namespace InstaRun.ContextMenuManagement
 {
-    public abstract class Item
+    public class Separator : Item
     {
-        
+        public Separator()
+        {
+
+        }
     }
 }
