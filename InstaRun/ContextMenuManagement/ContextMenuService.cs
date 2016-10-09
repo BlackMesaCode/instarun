@@ -155,12 +155,18 @@ namespace InstaRun.ContextMenuManagement
 
             // add start with windows
             var startWithWindowsMenuItem = new MenuItem();
-            startWithWindowsMenuItem.Header = "Autorun";
+            startWithWindowsMenuItem.Header = "Autorun (Registry)";
             startWithWindowsMenuItem.IsCheckable = true;
             startWithWindowsMenuItem.IsChecked = IsStartingWithWindows();
             startWithWindowsMenuItem.DataContext = startWithWindowsMenuItem.IsChecked;
             startWithWindowsMenuItem.Click += StartWithWindowsMenuItem_Click;
             settingsContainer.Items.Add(startWithWindowsMenuItem);
+
+            // Copy to AutoStart
+            var createAutostartShortcutMenuItem = new MenuItem();
+            createAutostartShortcutMenuItem.Header = "Autorun (Autostart Folder)";
+            createAutostartShortcutMenuItem.Click += CreateAutostartShortcutMenuItem_Click; ;
+            settingsContainer.Items.Add(createAutostartShortcutMenuItem);
 
             // Open config folder
             var openConfigFolderMenuItem = new MenuItem();
@@ -193,7 +199,6 @@ namespace InstaRun.ContextMenuManagement
             closeApplicationMenuItem.Click += CloseApplicationMenuItem_Click;
             settingsContainer.Items.Add(closeApplicationMenuItem);
         }
-
 
         private void StartWithWindowsMenuItem_Click(object sender, RoutedEventArgs e)
         {
@@ -229,6 +234,33 @@ namespace InstaRun.ContextMenuManagement
         private void OpenConfigFolderMenuItem_Click(object sender, RoutedEventArgs e)
         {
             Process.Start("explorer.exe", App.ExeDir);
+        }
+
+        private void CreateAutostartShortcutMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var startupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
+
+            Type t = Type.GetTypeFromCLSID(new Guid("72C24DD5-D70A-438B-8A42-98424B88AFB8")); //Windows Script Host Shell Object
+            dynamic shell = Activator.CreateInstance(t);
+            try
+            {
+                var lnk = shell.CreateShortcut(Path.Combine(startupFolder, "InstaRun.lnk"));
+                try
+                {
+                    lnk.TargetPath = App.ExePath;
+                    lnk.IconLocation = "shell32.dll, 1";
+                    lnk.Save();
+                }
+                finally
+                {
+                    Marshal.FinalReleaseComObject(lnk);
+                }
+            }
+            finally
+            {
+                Marshal.FinalReleaseComObject(shell);
+            }
+
         }
 
         private void RestartMenuItem_Click(object sender, RoutedEventArgs e)
