@@ -43,8 +43,6 @@ namespace InstaRun
             kernel.Bind<TaskbarService>().To<TaskbarService>().InSingletonScope();
             kernel.Bind<HotkeyService>().To<HotkeyService>().InSingletonScope();
             kernel.Bind<KeyboardHook>().To<KeyboardHook>().InSingletonScope();
-            kernel.Bind<ClickAreaService>().To<ClickAreaService>().InSingletonScope();
-
 
             _instaRunService = kernel.Get<InstaRunService>();
         }
