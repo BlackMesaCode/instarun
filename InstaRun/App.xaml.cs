@@ -1,6 +1,7 @@
 ﻿using InstaRun.ConfigManagement;
 using InstaRun.ContextMenuManagement;
 using InstaRun.GlobalExceptionHandling;
+using InstaRun.SearchManagement;
 using InstaRun.TriggerManagement;
 using Ninject;
 using System;
@@ -43,6 +44,7 @@ namespace InstaRun
             kernel.Bind<TaskbarService>().To<TaskbarService>().InSingletonScope();
             kernel.Bind<HotkeyService>().To<HotkeyService>().InSingletonScope();
             kernel.Bind<KeyboardHook>().To<KeyboardHook>().InSingletonScope();
+            kernel.Bind<SearchBox>().To<SearchBox>().InSingletonScope();
 
             _instaRunService = kernel.Get<InstaRunService>();
         }

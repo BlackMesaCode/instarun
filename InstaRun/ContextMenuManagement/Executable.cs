@@ -3,12 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace InstaRun.ContextMenuManagement
 {
     public class Executable : Item
     {
         public string Name { get; set; }
+        public string MagicWords { get; set; }
+
+        [XmlIgnore]
+        public List<string> MagicWordsSplitted { get { return MagicWords.ToLower().Trim().Replace(" ", string.Empty).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList(); } }
 
         private string path;
         public string Path
@@ -29,9 +34,10 @@ namespace InstaRun.ContextMenuManagement
 
         }
 
-        public Executable(string name, string path, bool isGlobalPath = false, string arguments = "")
+        public Executable(string name, string magicwords, string path, bool isGlobalPath = false, string arguments = "")
         {
             Name = name;
+            MagicWords = magicwords;
             Path = path;
             IsInGlobalPath = isGlobalPath;
             Arguments = arguments;

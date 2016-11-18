@@ -93,6 +93,9 @@
     <Compile Include="GlobalExceptionHandling\IExceptionLogger.cs" />
     <Compile Include="GlobalExceptionHandling\MessageBoxLogger.cs" />
     <Compile Include="GlobalExceptionHandling\TextFileLogger.cs" />
+    <Compile Include="SearchManagement\SearchBox.xaml.cs">
+      <DependentUpon>SearchBox.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TriggerManagement\HotkeyService.cs" />
     <Compile Include="InstaRunService.cs" />
     <Compile Include="TriggerManagement\KeyboardHook.cs" />
@@ -148,6 +151,12 @@
     <None Include="Container.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="SearchManagement\SearchBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

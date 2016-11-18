@@ -40,7 +40,7 @@ namespace InstaRun.ConfigManagement
             }
 
             // Create SampleConfig.xml is not already existing
-            CreateSampleConfig();
+            CreateSampleConfigXml();
 
             // Read config.xml
             UpdateConfigFromXml();
@@ -60,16 +60,16 @@ namespace InstaRun.ConfigManagement
             var settings = new Settings();
             var items = new List<Item>()
             {
-                new Executable("Self", @"InstaRun.exe"),
-                new Executable("VSCode", @"code", true, "."),
-                new Executable("PowerShell", @"%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe"),
-                new Executable("UserProfile", @"%USERPROFILE%"),
+                new Executable("Self", "self", @"InstaRun.exe"),
+                new Executable("VSCode", "code, vscode", @"code", true, "."),
+                new Executable("PowerShell", "powershell, shell", @"%SystemRoot%\system32\WindowsPowerShell\v1.0\powershell.exe"),
+                new Executable("UserProfile", "userprofile", @"%USERPROFILE%"),
                 new Separator(),
                 new Container("Browsers", new List<Item>() {
-                    new Executable("Internet Explorer (Google)", @"iexplore", true, "www.google.de"),
-                    new Executable("Chrome", @"chrome", true),
+                    new Executable("Internet Explorer (Google)", "ie,iexplore,internetexplorer", @"iexplore", true, "www.google.de"),
+                    new Executable("Chrome", "chrome", @"chrome", true),
                     new Container("Test Browsers", new List<Item>() {
-                        new Executable("Firefox", @"firefox", true),
+                        new Executable("Firefox", "firefox, ff", @"firefox", true),
                     }),
                 }),
             };
