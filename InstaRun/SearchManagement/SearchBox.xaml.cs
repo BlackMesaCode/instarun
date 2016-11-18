@@ -111,7 +111,7 @@ namespace InstaRun.SearchManagement
                 if (matchingExe != null)
                 {
                     SearchTextBox.Text = string.Empty;
-                    Process.Start(matchingExe.Item1.Path);
+                    Process.Start(matchingExe.Item1.Path, matchingExe.Item1.Arguments);
                 }
                 this.Hide();
                 e.Handled = true;
