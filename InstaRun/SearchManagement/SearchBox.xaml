@@ -10,11 +10,13 @@
         ShowInTaskbar="False"
         SizeToContent="Height"
         ResizeMode="NoResize"
+        Visibility="Hidden"
         Width="200"
         FontSize="18"
         SnapsToDevicePixels="True"
         WindowStyle="None"
         BorderThickness="0"
+        Deactivated="Window_Deactivated"
         Title="SearchBox">
     <Grid>
         <TextBox Name="SearchTextBox" BorderThickness="2" Padding="4" CharacterCasing="Lower" TextChanged="SearchTextBox_TextChanged" KeyDown="SearchTextBox_KeyDown" AcceptsReturn="False" AcceptsTab="False"/>

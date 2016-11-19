@@ -35,6 +35,8 @@ namespace InstaRun.SearchManagement
             SearchTextBox.Focus();
         }
 
+
+
         private void _configService_OnConfigChanged(Config newConfig)
         {
             Executables = GetAllExecutables(newConfig.Items);
@@ -122,5 +124,12 @@ namespace InstaRun.SearchManagement
                 e.Handled = true;
             }
         }
+
+        private void Window_Deactivated(object sender, EventArgs e)
+        {
+            Hide();
+        }
+
+
     }
 }

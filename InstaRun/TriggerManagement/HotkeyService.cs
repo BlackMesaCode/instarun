@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace InstaRun.TriggerManagement
@@ -36,16 +37,24 @@ namespace InstaRun.TriggerManagement
             
             if (e.KeyCode == System.Windows.Forms.Keys.R && System.Windows.Forms.Control.ModifierKeys == System.Windows.Forms.Keys.Alt)  // && _keyboardHook.IsKeyPressed(System.Windows.Forms.Keys.LWin)) //
             {
-                _searchBoxService.SearchTextBox.Text = "";
-                _searchBoxService.Show();
-                _searchBoxService.Activate();
+                
+                App.Current.Dispatcher.BeginInvoke(new Action(() => Test()));
+                
                 e.Handled = true;
             }
             else
                 e.Handled = false;
         }
 
-
+        private void Test()
+        {
+            _searchBoxService.SearchTextBox.Text = "";
+            _searchBoxService.Show();
+            Thread.Sleep(100);  // ugly workaround, but without some kind of sleep, window wont get activated reliably
+            _searchBoxService.Activate();
+            _searchBoxService.Topmost = true;
+            _searchBoxService.SearchTextBox.Focus();
+        }
 
     }
 }
