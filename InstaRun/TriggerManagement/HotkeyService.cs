@@ -38,7 +38,7 @@ namespace InstaRun.TriggerManagement
             if (e.KeyCode == System.Windows.Forms.Keys.R && System.Windows.Forms.Control.ModifierKeys == System.Windows.Forms.Keys.Alt)  // && _keyboardHook.IsKeyPressed(System.Windows.Forms.Keys.LWin)) //
             {
                 
-                App.Current.Dispatcher.BeginInvoke(new Action(() => Test()));
+                App.Current.Dispatcher.BeginInvoke(new Action(() => ShowAndActivateSearchBox()));
                 
                 e.Handled = true;
             }
@@ -46,7 +46,7 @@ namespace InstaRun.TriggerManagement
                 e.Handled = false;
         }
 
-        private void Test()
+        private void ShowAndActivateSearchBox()
         {
             _searchBoxService.SearchTextBox.Text = "";
             _searchBoxService.Show();
