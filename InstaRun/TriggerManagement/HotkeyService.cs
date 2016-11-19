@@ -18,6 +18,8 @@ namespace InstaRun.TriggerManagement
         {
             _contextMenuService = contextMenuService;
             _searchBoxService = searchBoxService;
+            _searchBoxService.Show();
+            _searchBoxService.Hide();
 
             // Register Hotkey to Open Context Menu
             _keyboardHook = keyboardHook;
