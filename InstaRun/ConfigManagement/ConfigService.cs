@@ -28,6 +28,11 @@ namespace InstaRun.ConfigManagement
         private FileWatcherService _fileWatcherService;
 
         private Config _config;
+        public Config Config
+        {
+            get { return _config; }
+            private set { _config = value; }
+        }
 
 
         public ConfigService()

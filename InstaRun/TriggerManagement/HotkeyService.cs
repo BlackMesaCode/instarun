@@ -1,5 +1,7 @@
-﻿using InstaRun.ContextMenuManagement;
+﻿using InstaRun.ConfigManagement;
+using InstaRun.ContextMenuManagement;
 using InstaRun.SearchManagement;
+using Ninject;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,18 +13,13 @@ namespace InstaRun.TriggerManagement
 {
     public class HotkeyService
     {
-        private ContextMenuService _contextMenuService;
         private KeyboardHook _keyboardHook;
-        private SearchBox _searchBoxService;
 
-        public HotkeyService(ContextMenuService contextMenuService, KeyboardHook keyboardHook, SearchBox searchBoxService)
+        public SearchBox SearchBox { get; set; }
+
+        public HotkeyService(ContextMenuService contextMenuService, KeyboardHook keyboardHook)
         {
-            _contextMenuService = contextMenuService;
-            _searchBoxService = searchBoxService;
-            _searchBoxService.Show();
-            _searchBoxService.Hide();
-
-            // Register Hotkey to Open Context Menu
+            // Register Hotkey to open SearchBox
             _keyboardHook = keyboardHook;
             _keyboardHook.KeyDown += KeyboardHook_KeyDown;
         }
@@ -37,23 +34,19 @@ namespace InstaRun.TriggerManagement
             
             if (e.KeyCode == System.Windows.Forms.Keys.R && System.Windows.Forms.Control.ModifierKeys == System.Windows.Forms.Keys.Alt)  // && _keyboardHook.IsKeyPressed(System.Windows.Forms.Keys.LWin)) //
             {
-                
                 App.Current.Dispatcher.BeginInvoke(new Action(() => ShowAndActivateSearchBox()));
-                
                 e.Handled = true;
             }
             else
                 e.Handled = false;
         }
 
+
         private void ShowAndActivateSearchBox()
         {
-            _searchBoxService.SearchTextBox.Text = "";
-            _searchBoxService.Show();
-            Thread.Sleep(100);  // ugly workaround, but without some kind of sleep, window wont get activated reliably
-            _searchBoxService.Activate();
-            _searchBoxService.Topmost = true;
-            _searchBoxService.SearchTextBox.Focus();
+            var configService = App.Kernel.Get<ConfigService>();
+            SearchBox = new SearchBox(configService);
+            SearchBox.Show();
         }
 
     }

@@ -27,6 +27,8 @@ namespace InstaRun
         public static readonly string LogDirName = "ErrorLogs";
         public static readonly string LogDirPath = Path.Combine(ExeDir, LogDirName);
 
+        public static StandardKernel Kernel;
+
         private InstaRunService _instaRunService;
         private GlobalExceptionHandler _globalExceptionHandler;
 
@@ -37,16 +39,16 @@ namespace InstaRun
             _globalExceptionHandler.ExceptionLoggers.Add(new MessageBoxLogger());
 
 
-            var kernel = new StandardKernel();
+            Kernel = new StandardKernel();
 
-            kernel.Bind<ConfigService>().To<ConfigService>().InSingletonScope();
-            kernel.Bind<ContextMenuService>().To<ContextMenuService>().InSingletonScope();
-            kernel.Bind<TaskbarService>().To<TaskbarService>().InSingletonScope();
-            kernel.Bind<HotkeyService>().To<HotkeyService>().InSingletonScope();
-            kernel.Bind<KeyboardHook>().To<KeyboardHook>().InSingletonScope();
-            kernel.Bind<SearchBox>().To<SearchBox>().InSingletonScope();
+            Kernel.Bind<ConfigService>().To<ConfigService>().InSingletonScope();
+            Kernel.Bind<ContextMenuService>().To<ContextMenuService>().InSingletonScope();
+            Kernel.Bind<TaskbarService>().To<TaskbarService>().InSingletonScope();
+            Kernel.Bind<HotkeyService>().To<HotkeyService>().InSingletonScope();
+            Kernel.Bind<KeyboardHook>().To<KeyboardHook>().InSingletonScope();
+            Kernel.Bind<SearchBox>().To<SearchBox>().InTransientScope();
 
-            _instaRunService = kernel.Get<InstaRunService>();
+            _instaRunService = Kernel.Get<InstaRunService>();
         }
 
  

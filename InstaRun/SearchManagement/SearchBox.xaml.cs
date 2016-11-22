@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,6 +12,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
@@ -29,18 +31,11 @@ namespace InstaRun.SearchManagement
         public SearchBox(ConfigService configService)
         {
             InitializeComponent();
+
             _configService = configService;
-            _configService.OnConfigChanged += _configService_OnConfigChanged;
-
-            SearchTextBox.Focus();
+            Executables = GetAllExecutables(_configService.Config.Items);
         }
 
-
-
-        private void _configService_OnConfigChanged(Config newConfig)
-        {
-            Executables = GetAllExecutables(newConfig.Items);
-        }
 
 
         private List<Executable> GetAllExecutables(List<Item> items, List<Executable> executables = null)
@@ -127,9 +122,36 @@ namespace InstaRun.SearchManagement
 
         private void Window_Deactivated(object sender, EventArgs e)
         {
-            Hide();
+            Close();
         }
 
+
+        /// <summary>
+        ///     This function sets the keyboard focus to the specified window. All subsequent keyboard input is directed to this window. The window, if any, that previously had the keyboard focus loses it.
+        /// </summary>
+        /// <param name="hWnd">Handle to the window that will receive the keyboard input. If this parameter is NULL, keystrokes are ignored.</param>
+        /// <returns>The handle to the window that previously had the keyboard focus indicates success.</returns>
+        [DllImport("user32.dll")]
+        public static extern IntPtr SetFocus(IntPtr hWnd);
+
+
+        /// <summary>
+        ///     The SetForegroundWindow function puts the thread that created the specified window into the foreground and activates the window. Keyboard input is directed to the window, and various visual cues are changed for the user.
+        /// </summary>
+        /// <param name="hWnd">Handle to the window that should be activated and brought to the foreground. </param>
+        /// <returns>If the window was brought to the foreground, the return value is nonzero. </returns>
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool SetForegroundWindow(IntPtr hWnd);
+
+
+        private void SearchTextBox_Loaded(object sender, RoutedEventArgs e)
+        {
+            var windowHandle = new WindowInteropHelper(this).Handle;
+            SetForegroundWindow(windowHandle);
+            SetFocus(windowHandle);
+            SearchTextBox.Focus();
+        }
 
     }
 }
