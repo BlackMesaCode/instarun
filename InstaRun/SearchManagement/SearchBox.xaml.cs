@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -147,11 +148,16 @@ namespace InstaRun.SearchManagement
 
         private void SearchTextBox_Loaded(object sender, RoutedEventArgs e)
         {
+
+        }
+
+        private void Window_ContentRendered(object sender, EventArgs e)
+        {
             var windowHandle = new WindowInteropHelper(this).Handle;
             SetForegroundWindow(windowHandle);
+            Activate();
             SetFocus(windowHandle);
             SearchTextBox.Focus();
         }
-
     }
 }

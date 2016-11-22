@@ -47,7 +47,7 @@ namespace InstaRun.ContextMenuManagement
             // Custom settings could be read from config.Settings if there were any ...
 
             var contextMenu = new ContextMenu();
-            CreateContextMenuHelper(contextMenu, null, items);
+            //CreateContextMenuHelper(contextMenu, null, items);
 
             AddSettingsMenu(contextMenu);
 

@@ -16,6 +16,7 @@
         WindowStyle="None"
         BorderThickness="0"
         Deactivated="Window_Deactivated"
+        ContentRendered="Window_ContentRendered"
         Title="SearchBox">
     <Grid>
         <TextBox Name="SearchTextBox" BorderThickness="2" Padding="4" CharacterCasing="Lower" TextChanged="SearchTextBox_TextChanged" KeyDown="SearchTextBox_KeyDown" AcceptsReturn="False" AcceptsTab="False" Loaded="SearchTextBox_Loaded"/>
